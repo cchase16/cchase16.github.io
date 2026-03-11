@@ -1,0 +1,1576 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Gimme Friction Baby — Neon Glass Edition</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+    :root {
+      --bg-1: #050714;
+      --bg-2: #090d22;
+      --bg-3: #120726;
+      --fg: #f7f4ff;
+      --dim: #b7b1d2;
+      --glass: rgba(255,255,255,.08);
+      --glass-2: rgba(255,255,255,.04);
+      --glass-border: rgba(255,255,255,.16);
+      --cyan: #52f7ff;
+      --cyan-2: #8efcff;
+      --pink: #ff4fd8;
+      --pink-2: #ff8ef0;
+      --violet: #8d6bff;
+      --deep: #050714;
+      --shadow: rgba(0,0,0,.42);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      color: var(--fg);
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at 20% 15%, rgba(82,247,255,.14), transparent 28%),
+        radial-gradient(circle at 80% 18%, rgba(255,79,216,.14), transparent 30%),
+        radial-gradient(circle at 50% 100%, rgba(141,107,255,.14), transparent 34%),
+        linear-gradient(180deg, var(--bg-2), var(--bg-1) 42%, #04040e 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(255,255,255,.025), rgba(255,255,255,0) 22%, rgba(255,255,255,.018) 60%, rgba(255,255,255,0)),
+        repeating-linear-gradient(
+          180deg,
+          rgba(255,255,255,.024) 0px,
+          rgba(255,255,255,.024) 1px,
+          transparent 2px,
+          transparent 4px
+        );
+      mix-blend-mode: soft-light;
+      opacity: .45;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 18px 12px 24px;
+    }
+
+    .wrap {
+      display: grid;
+      gap: 14px;
+      justify-items: center;
+      width: min(100%, 1020px);
+    }
+
+    canvas {
+      width: min(96vw, 960px);
+      height: auto;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(82,247,255,.08), transparent 30%),
+        radial-gradient(circle at 50% 100%, rgba(255,79,216,.08), transparent 28%),
+        linear-gradient(180deg, #070b1c 0%, #060815 44%, #04040d 100%);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow:
+        0 18px 50px rgba(0,0,0,.55),
+        0 0 0 1px rgba(82,247,255,.12) inset,
+        0 0 40px rgba(82,247,255,.08),
+        0 0 80px rgba(255,79,216,.06);
+      image-rendering: auto;
+    }
+
+    .controls {
+      width: min(96vw, 960px);
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      align-items: start;
+    }
+
+    .panel {
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.055)),
+        linear-gradient(135deg, rgba(82,247,255,.06), rgba(255,79,216,.05) 58%, rgba(141,107,255,.08));
+      backdrop-filter: blur(16px) saturate(140%);
+      -webkit-backdrop-filter: blur(16px) saturate(140%);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 14px 16px;
+      box-shadow:
+        0 14px 36px rgba(0,0,0,.26),
+        0 0 0 1px rgba(255,255,255,.02) inset,
+        0 0 24px rgba(82,247,255,.06);
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.18), transparent 25%, transparent 72%, rgba(255,255,255,.05)),
+        radial-gradient(circle at top right, rgba(82,247,255,.12), transparent 28%);
+      opacity: .9;
+    }
+
+    .panel h2 {
+      position: relative;
+      margin: 0 0 10px;
+      font: 700 15px/1 Orbitron, Inter, Arial, sans-serif;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: #fdfdff;
+      text-shadow:
+        0 0 8px rgba(255,255,255,.2),
+        0 0 18px rgba(82,247,255,.18);
+    }
+
+    .speed-row {
+      position: relative;
+      display: grid;
+      gap: 9px;
+    }
+
+    .speed-topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #e3def7;
+    }
+
+    .speed-value {
+      font-weight: 800;
+      color: white;
+      text-shadow: 0 0 10px rgba(82,247,255,.35);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      appearance: none;
+      height: 8px;
+      border-radius: 999px;
+      background:
+        linear-gradient(90deg, rgba(82,247,255,.85), rgba(141,107,255,.9), rgba(255,79,216,.85));
+      outline: none;
+      box-shadow:
+        inset 0 0 8px rgba(255,255,255,.12),
+        0 0 14px rgba(82,247,255,.16);
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.9);
+      background:
+        radial-gradient(circle at 30% 30%, white, #b8fbff 42%, #52f7ff 72%);
+      box-shadow:
+        0 0 0 4px rgba(82,247,255,.16),
+        0 0 18px rgba(82,247,255,.55);
+      cursor: pointer;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.9);
+      background:
+        radial-gradient(circle at 30% 30%, white, #b8fbff 42%, #52f7ff 72%);
+      box-shadow:
+        0 0 0 4px rgba(82,247,255,.16),
+        0 0 18px rgba(82,247,255,.55);
+      cursor: pointer;
+    }
+
+    .songs {
+      position: relative;
+      display: grid;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .song-option {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.045));
+      border: 1px solid rgba(255,255,255,.1);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+      transition: transform .14s ease, border-color .14s ease, box-shadow .14s ease;
+    }
+
+    .song-option:hover {
+      transform: translateY(-1px);
+      border-color: rgba(82,247,255,.28);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.03),
+        0 0 18px rgba(82,247,255,.08);
+    }
+
+    .song-option input {
+      margin-top: 3px;
+      accent-color: #52f7ff;
+    }
+
+    .song-name {
+      font-weight: 700;
+      color: #fff;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .song-desc {
+      color: #d0caeb;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .fire-wrap {
+      width: min(96vw, 960px);
+      display: flex;
+      justify-content: center;
+      padding-bottom: max(4px, env(safe-area-inset-bottom));
+    }
+
+    .fire-btn {
+      position: relative;
+      min-width: 240px;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 999px;
+      padding: 16px 34px;
+      font: 800 21px/1 Orbitron, Inter, Arial, sans-serif;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: white;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.08)),
+        linear-gradient(135deg, #00d8ff 0%, #6467ff 48%, #ff4fd8 100%);
+      box-shadow:
+        0 14px 34px rgba(0,0,0,.34),
+        0 0 0 1px rgba(255,255,255,.06) inset,
+        0 0 24px rgba(82,247,255,.22),
+        0 0 48px rgba(255,79,216,.14);
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform .14s ease, box-shadow .14s ease, filter .14s ease;
+    }
+
+    .fire-btn::before {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      border-radius: inherit;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,0) 42%);
+      opacity: .7;
+    }
+
+    .fire-btn:hover {
+      transform: translateY(-1px);
+      filter: saturate(1.08);
+      box-shadow:
+        0 16px 40px rgba(0,0,0,.36),
+        0 0 0 1px rgba(255,255,255,.08) inset,
+        0 0 34px rgba(82,247,255,.28),
+        0 0 58px rgba(255,79,216,.18);
+    }
+
+    .fire-btn:active {
+      transform: translateY(1px) scale(.992);
+    }
+
+    .hint {
+      width: min(96vw, 960px);
+      color: #d6d0ee;
+      font-size: 14px;
+      text-align: center;
+      line-height: 1.45;
+      padding: 2px 10px max(4px, env(safe-area-inset-bottom));
+      text-shadow: 0 0 14px rgba(141,107,255,.12);
+    }
+
+    .hint strong {
+      color: white;
+      text-shadow:
+        0 0 8px rgba(255,255,255,.18),
+        0 0 14px rgba(82,247,255,.18);
+    }
+
+    @media (max-width: 640px) {
+      body { padding-top: 14px; }
+      canvas { border-radius: 20px; }
+      .panel { border-radius: 16px; }
+      .fire-btn { width: 100%; min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <canvas id="game" width="640" height="480" aria-label="Gimme Friction Baby browser game"></canvas>
+
+    <div class="controls">
+      <section class="panel" aria-labelledby="speed-heading">
+        <h2 id="speed-heading">Cannon Speed</h2>
+        <div class="speed-row">
+          <div class="speed-topline">
+            <span>Swing speed</span>
+            <span class="speed-value" id="speedValue">100%</span>
+          </div>
+          <input id="speedSlider" type="range" min="40" max="220" value="100" step="5" aria-label="Adjust cannon speed" />
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="music-heading">
+        <h2 id="music-heading">Soundtrack Select</h2>
+        <div class="songs" id="songChoices">
+          <label class="song-option">
+            <input type="radio" name="song" value="neon" checked />
+            <span>
+              <span class="song-name">Neon Rebound</span>
+              <span class="song-desc">A brisk arcade-funk loop with bright stabs and tight bounce.</span>
+            </span>
+          </label>
+          <label class="song-option">
+            <input type="radio" name="song" value="velvet" />
+            <span>
+              <span class="song-name">Velvet Orbit</span>
+              <span class="song-desc">A slower, moodier after-hours groove with its own melody and chord path.</span>
+            </span>
+          </label>
+        </div>
+      </section>
+    </div>
+
+    <div class="fire-wrap">
+      <button id="fireButton" class="fire-btn" type="button" aria-label="Fire the cannon">Fire</button>
+    </div>
+
+    <div class="hint"><strong>Tap Fire</strong> or press <strong>Space</strong> to shoot. Balls start at 3, then 2, then 1, then pop. If a shot drops back below the dotted line, it’s over. Press Fire after game over to restart.</div>
+  </div>
+
+<script>
+(() => {
+  'use strict';
+
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  const fireButton = document.getElementById('fireButton');
+  const speedSlider = document.getElementById('speedSlider');
+  const speedValue = document.getElementById('speedValue');
+  const songChoices = document.getElementById('songChoices');
+
+  const WIDTH = 640;
+  const HEIGHT = 480;
+  const SHOOTER_X = 320;
+  const SHOOTER_Y = 450;
+  const PLAY_LEFT = 130;
+  const PLAY_RIGHT = 510;
+  const PLAY_TOP = 15;
+  const DEATH_LINE = 395;
+  const FRICTION = 0.975;
+
+  const UI = {
+    cyan: '#52f7ff',
+    cyanSoft: 'rgba(82,247,255,.38)',
+    pink: '#ff4fd8',
+    pinkSoft: 'rgba(255,79,216,.34)',
+    violet: '#8d6bff',
+    white: '#ffffff',
+    bgTop: '#071022',
+    bgBottom: '#04040d',
+    grid: 'rgba(82,247,255,.07)'
+  };
+
+  const TRACKS = {
+    neon: {
+      name: 'Neon Rebound',
+      bpm: 108,
+      barSteps: 16,
+      swing: 0,
+      bassline: [43, null, 43, null, 46, null, 48, null, 43, null, 43, null, 50, null, 48, null],
+      chords: [
+        [55, 59, 62], [55, 59, 62], [58, 62, 65], [58, 62, 65],
+        [60, 64, 67], [60, 64, 67], [58, 62, 65], [58, 62, 65],
+      ],
+      lead: [
+        74, 71, 67, 69, 71, 67, 64, 67,
+        72, 69, 65, 67, 69, 65, 62, 64
+      ],
+      leadActiveSteps: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+      kickSteps: [0, 4, 8, 12],
+      snareSteps: [4, 12],
+      hatSteps: [1, 3, 5, 7, 9, 11, 13, 15],
+      extraHatSteps: [2, 6, 10, 14],
+      kickPitch: 150,
+      kickEnd: 42,
+      chordWave: 'sawtooth',
+      chordGain: 0.022,
+      chordFilter: 1100,
+      bassWave: 'triangle',
+      bassGain: 0.18,
+      bassFilter: 700,
+      snareTone: 185,
+      snareNoise: 0.35,
+      hatMain: 0.018,
+      hatOff: 0.01,
+      leadWave: 'square',
+      leadGain: 0.045,
+      leadFilter: 1800,
+      leadDurMult: 0.78,
+    },
+    velvet: {
+      name: 'Velvet Orbit',
+      bpm: 78,
+      barSteps: 16,
+      swing: 0.06,
+      bassline: [34, null, null, 41, null, 39, null, null, 36, null, null, 43, null, 41, null, null],
+      chords: [
+        [50, 53, 57, 60],
+        [48, 52, 55, 59],
+        [45, 50, 53, 57],
+        [47, 50, 55, 59],
+        [50, 53, 57, 60],
+        [52, 55, 59, 62],
+        [47, 50, 55, 59],
+        [45, 50, 53, 57]
+      ],
+      lead: [
+        62, null, 65, 67, null, 70, 67, null,
+        60, null, 62, 65, null, 69, 67, null
+      ],
+      leadActiveSteps: [0, 2, 3, 5, 6, 8, 10, 11, 13, 14],
+      kickSteps: [0, 6, 8, 14],
+      snareSteps: [4, 12],
+      hatSteps: [3, 7, 11, 15],
+      extraHatSteps: [1, 5, 9, 13],
+      kickPitch: 112,
+      kickEnd: 34,
+      chordWave: 'triangle',
+      chordGain: 0.032,
+      chordFilter: 780,
+      bassWave: 'sine',
+      bassGain: 0.24,
+      bassFilter: 380,
+      snareTone: 145,
+      snareNoise: 0.2,
+      hatMain: 0.008,
+      hatOff: 0.005,
+      leadWave: 'triangle',
+      leadGain: 0.05,
+      leadFilter: 1100,
+      leadDurMult: 1.45,
+    }
+  };
+
+  const state = {
+    mode: 'shooter',
+    score: 0,
+    hi: Number(localStorage.getItem('gfb-highscore') || 0),
+    firstShot: false,
+    angleDeg: 182,
+    angleVel: 2,
+    cannonSpeedMultiplier: 1,
+    ballCounter: 10,
+    active: null,
+    balls: [],
+    nearestIndex: -1,
+    nearestDist: 10000,
+    growthTargetScale: 100,
+    gameOverPanelY: -100,
+    titleAlpha: 1,
+    particles: [],
+    debris: [],
+    mouseX: SHOOTER_X,
+    mouseY: SHOOTER_Y,
+    wall: false,
+    time: 0,
+    pulse: 0,
+    cameraShake: 0,
+  };
+
+  function saveHi() {
+    localStorage.setItem('gfb-highscore', String(state.hi));
+  }
+
+  const audio = {
+    ctx: null,
+    master: null,
+    musicBus: null,
+    sfxBus: null,
+    started: false,
+    nextNoteTime: 0,
+    step: 0,
+    timerId: null,
+    currentTrackKey: 'neon',
+  };
+
+  function currentTrack() {
+    return TRACKS[audio.currentTrackKey] || TRACKS.neon;
+  }
+
+  function ensureAudio() {
+    if (audio.ctx) return;
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    audio.ctx = new AudioCtx();
+    audio.master = audio.ctx.createGain();
+    audio.master.gain.value = 0.16;
+    audio.musicBus = audio.ctx.createGain();
+    audio.musicBus.gain.value = 0.65;
+    audio.sfxBus = audio.ctx.createGain();
+    audio.sfxBus.gain.value = 0.9;
+    audio.musicBus.connect(audio.master);
+    audio.sfxBus.connect(audio.master);
+    audio.master.connect(audio.ctx.destination);
+  }
+
+  function midiToFreq(midi) {
+    return 440 * Math.pow(2, (midi - 69) / 12);
+  }
+
+  function startAudio() {
+    ensureAudio();
+    if (!audio.ctx) return;
+    if (audio.ctx.state === 'suspended') audio.ctx.resume();
+    if (audio.started) return;
+    audio.started = true;
+    audio.nextNoteTime = audio.ctx.currentTime + 0.05;
+    audio.step = 0;
+    scheduler();
+  }
+
+  function restartMusicLoop() {
+    if (!audio.ctx || !audio.started) return;
+    if (audio.timerId) {
+      clearTimeout(audio.timerId);
+      audio.timerId = null;
+    }
+    audio.nextNoteTime = audio.ctx.currentTime + 0.05;
+    audio.step = 0;
+    scheduler();
+  }
+
+  function setTrack(trackKey) {
+    if (!TRACKS[trackKey]) return;
+    audio.currentTrackKey = trackKey;
+    restartMusicLoop();
+  }
+
+  function scheduler() {
+    if (!audio.ctx || !audio.started) return;
+    const track = currentTrack();
+    const secondsPerStep = 60 / track.bpm / 4;
+    while (audio.nextNoteTime < audio.ctx.currentTime + 0.15) {
+      const stepIndex = audio.step % track.barSteps;
+      const swingOffset = (track.swing && stepIndex % 2 === 1) ? secondsPerStep * track.swing : 0;
+      scheduleStep(stepIndex, audio.nextNoteTime + swingOffset, secondsPerStep, track);
+      audio.nextNoteTime += secondsPerStep;
+      audio.step = (audio.step + 1) % track.barSteps;
+    }
+    audio.timerId = setTimeout(scheduler, 25);
+  }
+
+  function scheduleStep(step, time, stepDur, track) {
+    const chord = track.chords[step % track.chords.length];
+    const bassMidi = track.bassline[step];
+    const leadMidi = track.lead[step];
+
+    if (track === TRACKS.neon) {
+      if (step % 2 === 0) playChord(chord, time, stepDur * 1.9, track);
+    } else {
+      if (step === 0 || step === 4 || step === 8 || step === 12) {
+        playChord(chord, time, stepDur * 3.7, track);
+      }
+    }
+
+    if (bassMidi != null) {
+      playBass(midiToFreq(bassMidi), time, stepDur * (track === TRACKS.velvet ? 1.8 : 0.95), track);
+    }
+
+    if (track.kickSteps.includes(step)) playKick(time, track);
+    if (track.snareSteps.includes(step)) playSnare(time, track);
+    if (track.hatSteps.includes(step)) playHat(time, track.hatMain, track === TRACKS.velvet ? 0.045 : 0.018);
+    if (track.extraHatSteps.includes(step)) playHat(time, track.hatOff, track === TRACKS.velvet ? 0.025 : 0.04);
+
+    if (leadMidi != null && track.leadActiveSteps.includes(step)) {
+      playLead(midiToFreq(leadMidi), time + stepDur * 0.03, stepDur * track.leadDurMult, track);
+    }
+  }
+
+  function playKick(time, track) {
+    const osc = audio.ctx.createOscillator();
+    const gain = audio.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(track.kickPitch, time);
+    osc.frequency.exponentialRampToValueAtTime(track.kickEnd, time + 0.16);
+    gain.gain.setValueAtTime(0.0001, time);
+    gain.gain.exponentialRampToValueAtTime(track === TRACKS.velvet ? 0.48 : 0.75, time + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.18);
+    osc.connect(gain).connect(audio.musicBus);
+    osc.start(time);
+    osc.stop(time + 0.2);
+  }
+
+  function playSnare(time, track) {
+    const buffer = audio.ctx.createBuffer(1, audio.ctx.sampleRate * 0.2, audio.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+    const noise = audio.ctx.createBufferSource();
+    noise.buffer = buffer;
+    const filter = audio.ctx.createBiquadFilter();
+    filter.type = 'highpass';
+    filter.frequency.value = track === TRACKS.velvet ? 850 : 1200;
+    const gain = audio.ctx.createGain();
+    gain.gain.setValueAtTime(track.snareNoise, time);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + (track === TRACKS.velvet ? 0.2 : 0.12));
+    noise.connect(filter).connect(gain).connect(audio.musicBus);
+    noise.start(time);
+    noise.stop(time + (track === TRACKS.velvet ? 0.21 : 0.13));
+
+    const osc = audio.ctx.createOscillator();
+    const toneGain = audio.ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(track.snareTone, time);
+    toneGain.gain.setValueAtTime(track === TRACKS.velvet ? 0.07 : 0.18, time);
+    toneGain.gain.exponentialRampToValueAtTime(0.0001, time + (track === TRACKS.velvet ? 0.17 : 0.09));
+    osc.connect(toneGain).connect(audio.musicBus);
+    osc.start(time);
+    osc.stop(time + (track === TRACKS.velvet ? 0.18 : 0.1));
+  }
+
+  function playHat(time, gainAmt, dur) {
+    const buffer = audio.ctx.createBuffer(1, Math.max(1, Math.floor(audio.ctx.sampleRate * dur)), audio.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+    const noise = audio.ctx.createBufferSource();
+    noise.buffer = buffer;
+    const filter = audio.ctx.createBiquadFilter();
+    filter.type = 'highpass';
+    filter.frequency.value = 7000;
+    const gain = audio.ctx.createGain();
+    gain.gain.setValueAtTime(gainAmt, time);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+    noise.connect(filter).connect(gain).connect(audio.musicBus);
+    noise.start(time);
+    noise.stop(time + dur);
+  }
+
+  function playBass(freq, time, dur, track) {
+    const osc = audio.ctx.createOscillator();
+    const gain = audio.ctx.createGain();
+    osc.type = track.bassWave;
+    osc.frequency.setValueAtTime(freq, time);
+    gain.gain.setValueAtTime(0.0001, time);
+    gain.gain.exponentialRampToValueAtTime(track.bassGain, time + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+    const filter = audio.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = track.bassFilter;
+    osc.connect(filter).connect(gain).connect(audio.musicBus);
+    osc.start(time);
+    osc.stop(time + dur + 0.02);
+  }
+
+  function playChord(notes, time, dur, track) {
+    for (const midi of notes) {
+      const osc = audio.ctx.createOscillator();
+      const gain = audio.ctx.createGain();
+      const filter = audio.ctx.createBiquadFilter();
+      osc.type = track.chordWave;
+      osc.frequency.setValueAtTime(midiToFreq(midi), time);
+      filter.type = 'lowpass';
+      filter.frequency.value = track.chordFilter;
+      gain.gain.setValueAtTime(0.0001, time);
+      gain.gain.linearRampToValueAtTime(track.chordGain, time + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+      osc.connect(filter).connect(gain).connect(audio.musicBus);
+      osc.start(time);
+      osc.stop(time + dur + 0.03);
+    }
+  }
+
+  function playLead(freq, time, dur, track) {
+    const osc = audio.ctx.createOscillator();
+    const gain = audio.ctx.createGain();
+    const filter = audio.ctx.createBiquadFilter();
+    const lfo = audio.ctx.createOscillator();
+    const lfoGain = audio.ctx.createGain();
+
+    osc.type = track.leadWave;
+    osc.frequency.setValueAtTime(freq, time);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(track.leadFilter, time);
+    filter.Q.value = 1.2;
+
+    lfo.type = 'sine';
+    lfo.frequency.value = track === TRACKS.velvet ? 4.5 : 6;
+    lfoGain.gain.value = track === TRACKS.velvet ? 5 : 3.5;
+    lfo.connect(lfoGain).connect(osc.frequency);
+
+    gain.gain.setValueAtTime(0.0001, time);
+    gain.gain.linearRampToValueAtTime(track.leadGain, time + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+
+    osc.connect(filter).connect(gain).connect(audio.musicBus);
+    lfo.start(time);
+    osc.start(time);
+    osc.stop(time + dur + 0.03);
+    lfo.stop(time + dur + 0.03);
+  }
+
+  function playShootSound() {
+    if (!audio.ctx) return;
+    const t = audio.ctx.currentTime;
+    const osc = audio.ctx.createOscillator();
+    const gain = audio.ctx.createGain();
+    const filter = audio.ctx.createBiquadFilter();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(520, t);
+    osc.frequency.exponentialRampToValueAtTime(180, t + 0.08);
+    filter.type = 'lowpass';
+    filter.frequency.value = 1800;
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.18, t + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.1);
+    osc.connect(filter).connect(gain).connect(audio.sfxBus);
+    osc.start(t);
+    osc.stop(t + 0.11);
+  }
+
+  function playGlassSound() {
+    if (!audio.ctx) return;
+    const t = audio.ctx.currentTime;
+    const buffer = audio.ctx.createBuffer(1, Math.floor(audio.ctx.sampleRate * 0.28), audio.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < data.length; i++) {
+      const env = Math.pow(1 - i / data.length, 1.8);
+      data[i] = (Math.random() * 2 - 1) * env;
+    }
+    const src = audio.ctx.createBufferSource();
+    src.buffer = buffer;
+    const band = audio.ctx.createBiquadFilter();
+    band.type = 'bandpass';
+    band.frequency.value = 2400;
+    band.Q.value = 0.9;
+    const high = audio.ctx.createBiquadFilter();
+    high.type = 'highpass';
+    high.frequency.value = 1500;
+    const gain = audio.ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.35, t + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+    src.connect(band).connect(high).connect(gain).connect(audio.sfxBus);
+    src.start(t);
+    src.stop(t + 0.24);
+
+    [1600, 2100, 2800].forEach((freq, i) => {
+      const osc = audio.ctx.createOscillator();
+      const og = audio.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, t + i * 0.005);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.68, t + 0.12 + i * 0.01);
+      og.gain.setValueAtTime(0.08, t + i * 0.005);
+      og.gain.exponentialRampToValueAtTime(0.0001, t + 0.16 + i * 0.01);
+      osc.connect(og).connect(audio.sfxBus);
+      osc.start(t + i * 0.005);
+      osc.stop(t + 0.18 + i * 0.01);
+    });
+  }
+
+  function rand(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  function createBall() {
+    state.ballCounter += 1;
+    const b = {
+      id: state.ballCounter,
+      x: SHOOTER_X,
+      y: SHOOTER_Y,
+      r: 10,
+      vx: 0,
+      vy: 0,
+      m: 1,
+      f: 1,
+      rotation: rand(-15, 15),
+      scale: 100,
+      cacheAsBitmap: false,
+    };
+    state.balls.push(b);
+    state.active = b;
+  }
+
+  function setScore(v) {
+    state.score = v;
+    if (state.score > state.hi) {
+      state.hi = state.score;
+      saveHi();
+    }
+  }
+
+  function restore() {
+    setScore(0);
+    state.ballCounter = 10;
+    state.balls = [];
+    state.active = null;
+    state.nearestIndex = -1;
+    state.nearestDist = 10000;
+    state.growthTargetScale = 100;
+    state.mode = 'shooter';
+    state.gameOverPanelY = -100;
+    state.particles = [];
+    state.debris = [];
+    state.titleAlpha = state.firstShot ? 0 : 1;
+    state.cameraShake = 0;
+    createBall();
+  }
+
+  function angleToShooterTip() {
+    const rad = state.angleDeg * Math.PI / 180;
+    return {
+      x: Math.cos(rad) * 60 + SHOOTER_X,
+      y: Math.sin(rad) * 60 + SHOOTER_Y,
+    };
+  }
+
+  function shootNow() {
+    startAudio();
+    if (!state.firstShot) state.firstShot = true;
+    if (state.mode === 'shooter') {
+      const b = state.active;
+      const tip = angleToShooterTip();
+      b.vx = (-(tip.x - SHOOTER_X)) / 4;
+      b.vy = (-(tip.y - SHOOTER_Y)) / 4;
+      playShootSound();
+      state.cameraShake = Math.max(state.cameraShake, 5);
+      state.mode = 'moveball';
+    } else if (state.mode === 'gomove') {
+      restore();
+    }
+  }
+
+  function createImpactParticles(b1, b2) {
+    const dx = b2.x - b1.x;
+    const dy = b2.y - b1.y;
+    const angle = Math.atan2(dy, dx);
+    const px = Math.cos(angle) * b1.r + b1.x;
+    const py = Math.sin(angle) * b1.r + b1.y;
+    for (let i = 0; i < 10; i++) {
+      state.particles.push({
+        x: px,
+        y: py,
+        vx: rand(-5, 5),
+        vy: rand(-5, 5),
+        life: 100,
+        kind: Math.random() < 0.5 ? 1 : 2,
+      });
+    }
+    state.cameraShake = Math.max(state.cameraShake, 3);
+  }
+
+  function createExplosion(b) {
+    for (let i = 0; i < 20; i++) {
+      const p1 = { x: rand(-15, 15), y: rand(-15, 15) };
+      const p2 = { x: rand(-15, 15), y: rand(-15, 15) };
+      state.debris.push({
+        x: b.x,
+        y: b.y,
+        vx: rand(-8, 8),
+        vy: rand(-8, 8),
+        rot: rand(-3, 3),
+        rotation: rand(0, 360),
+        alpha: 100,
+        p1,
+        p2,
+      });
+    }
+    state.cameraShake = Math.max(state.cameraShake, 8);
+  }
+
+  function checkCollision(b1, b2, b2Index) {
+    const dx = b2.x - b1.x;
+    const dy = b2.y - b1.y;
+    const dist = Math.hypot(dx, dy) || 0.0001;
+    if (dist < b1.r + b2.r) {
+      const overlap = dist - (b1.r + b2.r);
+      const nx = dx / dist;
+      const ny = dy / dist;
+      b1.x += overlap * nx;
+      b1.y += overlap * ny;
+
+      b2.f += 1;
+      if (b2.f === 4) {
+        const speed = Math.hypot(b1.vx, b1.vy);
+        state.debris.push({
+          x: b2.x,
+          y: b2.y,
+          vx: nx * speed,
+          vy: ny * speed,
+          rot: rand(-2, 2),
+          rotation: b2.rotation,
+          alpha: 100,
+          textZero: true,
+        });
+        setScore(state.score + 1);
+        playGlassSound();
+      }
+
+      const angle = Math.atan2(dy, dx);
+      const cosa = Math.cos(angle);
+      const sina = Math.sin(angle);
+      let vx1p = cosa * b1.vx + sina * b1.vy;
+      const vy1p = cosa * b1.vy - sina * b1.vx;
+      let vx2p = cosa * b2.vx + sina * b2.vy;
+      const P = vx1p * b1.m + vx2p * b2.m;
+      const V = vx1p - vx2p;
+      vx1p = (P - b2.m * V) / (b1.m + b2.m);
+      vx2p = V + vx1p;
+      b1.vx = cosa * vx1p - sina * vy1p;
+      b1.vy = cosa * vy1p + sina * vx1p;
+
+      if (b2.f === 4) {
+        createExplosion(b2);
+        state.balls.splice(b2Index, 1);
+        return;
+      }
+
+      createImpactParticles(b1, b2);
+    }
+  }
+
+  function findNearestMovingCollision() {
+    const b = state.active;
+    let n = -1;
+    let nd = 10000;
+    for (let p = 0; p < state.balls.length - 1; p++) {
+      const dx = b.x - b.vx - state.balls[p].x;
+      const dy = b.y - b.vy - state.balls[p].y;
+      const d = Math.sqrt(dx * dx + dy * dy) - state.balls[p].r;
+      if (d < nd) {
+        nd = d;
+        n = p;
+      }
+    }
+    if (n >= 0) checkCollision(b, state.balls[n], n);
+    state.nearestIndex = -1;
+    state.nearestDist = 10000;
+  }
+
+  function calcGrowthTarget() {
+    const b = state.active;
+    let n = -1;
+    let nd = 10000;
+    let wall = false;
+    for (let p = 0; p < state.balls.length - 1; p++) {
+      const dx = b.x - state.balls[p].x;
+      const dy = b.y - state.balls[p].y;
+      const d = Math.sqrt(dx * dx + dy * dy) - state.balls[p].r;
+      if (d < nd) {
+        n = p;
+        nd = d;
+      }
+    }
+    if (b.x - 120 < nd) { nd = b.x - 120; wall = true; }
+    if (520 - b.x < nd) { nd = 520 - b.x; wall = true; }
+    if (b.y - 5 < nd) { nd = b.y - 5; wall = true; }
+    if (395 - b.y < nd) { nd = 395 - b.y; wall = true; }
+    state.nearestIndex = n;
+    state.nearestDist = nd;
+    state.wall = wall;
+  }
+
+  function updateShooter() {
+    if (state.angleDeg >= 360 || state.angleDeg <= 180) {
+      state.angleVel *= -1;
+    }
+    state.angleDeg += state.angleVel * state.cannonSpeedMultiplier;
+    if (state.angleDeg > 360) state.angleDeg = 360;
+    if (state.angleDeg < 180) state.angleDeg = 180;
+    if (state.firstShot && state.titleAlpha > 0) {
+      state.titleAlpha = Math.max(0, state.titleAlpha - 0.01);
+    }
+  }
+
+  function triggerGameOver() {
+    const b = state.active;
+    createExplosion(b);
+    state.balls.pop();
+    state.active = null;
+    state.mode = 'gomove';
+  }
+
+  function updateMoveball() {
+    const b = state.active;
+    findNearestMovingCollision();
+    b.vx *= FRICTION;
+    b.vy *= FRICTION;
+
+    if (b.x - b.vx < 130 || b.x - b.vx > 510) b.vx *= -1;
+    if (b.y - b.vy < 15) b.vy *= -1;
+
+    b.x -= b.vx;
+    b.y -= b.vy;
+
+    if (b.vy < 0 && b.y + b.r > 395) {
+      triggerGameOver();
+      return;
+    }
+
+    if (Math.abs(b.vx) + Math.abs(b.vy) < 0.2) {
+      calcGrowthTarget();
+      b.m = 100000;
+      b.vx = 0;
+      b.vy = 0;
+      state.growthTargetScale = state.nearestDist / b.r * 100;
+      state.mode = 'grow2';
+    }
+  }
+
+  function updateGrow() {
+    const b = state.active;
+    const diff = state.growthTargetScale - b.scale;
+    b.scale += diff / 5;
+    if (diff < 10) {
+      b.scale = state.growthTargetScale;
+      b.r = state.nearestDist;
+      createBall();
+      state.mode = 'shooter';
+      state.nearestDist = 10000;
+      state.nearestIndex = -1;
+      state.wall = false;
+    }
+  }
+
+  function updateGameOverPanel() {
+    state.gameOverPanelY -= (state.gameOverPanelY - 240) / 10;
+  }
+
+  function updateParticles() {
+    for (let i = state.particles.length - 1; i >= 0; i--) {
+      const p = state.particles[i];
+      p.vy += 0.1;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life -= 1;
+      if (p.life < 10) state.particles.splice(i, 1);
+    }
+    for (let i = state.debris.length - 1; i >= 0; i--) {
+      const d = state.debris[i];
+      if (d.textZero) {
+        d.vy += 0.2;
+        d.x += d.vx;
+        d.y += d.vy;
+        d.rotation += d.rot;
+        if (d.y > 1000) state.debris.splice(i, 1);
+      } else {
+        d.x += d.vx;
+        d.y += d.vy;
+        d.rotation += d.rot;
+        d.alpha -= 0.5;
+        if (d.alpha < 1) state.debris.splice(i, 1);
+      }
+    }
+  }
+
+  function drawSceneBackground() {
+    const bg = ctx.createLinearGradient(0, 0, 0, HEIGHT);
+    bg.addColorStop(0, '#091224');
+    bg.addColorStop(0.48, '#060b17');
+    bg.addColorStop(1, '#03030b');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+    const glowTop = ctx.createRadialGradient(WIDTH * 0.5, 40, 20, WIDTH * 0.5, 40, 240);
+    glowTop.addColorStop(0, 'rgba(82,247,255,.14)');
+    glowTop.addColorStop(1, 'rgba(82,247,255,0)');
+    ctx.fillStyle = glowTop;
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+    const glowCorner = ctx.createRadialGradient(WIDTH * 0.8, HEIGHT * 0.2, 20, WIDTH * 0.8, HEIGHT * 0.2, 220);
+    glowCorner.addColorStop(0, 'rgba(255,79,216,.14)');
+    glowCorner.addColorStop(1, 'rgba(255,79,216,0)');
+    ctx.fillStyle = glowCorner;
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+    const gridOffset = (state.time * 40) % 28;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(PLAY_LEFT - 18, PLAY_TOP, PLAY_RIGHT - PLAY_LEFT + 36, DEATH_LINE - PLAY_TOP);
+    ctx.clip();
+
+    for (let x = PLAY_LEFT - 40; x < PLAY_RIGHT + 50; x += 28) {
+      ctx.strokeStyle = 'rgba(82,247,255,.055)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x + gridOffset, PLAY_TOP);
+      ctx.lineTo(x + gridOffset, DEATH_LINE);
+      ctx.stroke();
+    }
+
+    for (let y = PLAY_TOP; y < DEATH_LINE + 30; y += 24) {
+      ctx.strokeStyle = 'rgba(255,79,216,.035)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(PLAY_LEFT - 22, y);
+      ctx.lineTo(PLAY_RIGHT + 22, y);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    for (let i = 0; i < 24; i++) {
+      const x = (i * 89 + 37) % WIDTH;
+      const y = (i * 53 + 11) % (DEATH_LINE - 20) + 10;
+      const a = 0.18 + 0.15 * Math.sin(state.time * 2 + i);
+      ctx.fillStyle = `rgba(255,255,255,${a})`;
+      ctx.beginPath();
+      ctx.arc(x, y, (i % 3) * 0.5 + 0.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function drawPlayfieldFrame() {
+    const pulse = 0.55 + 0.45 * Math.sin(state.time * 2.4);
+    const frameGlow = 10 + 5 * pulse;
+
+    ctx.save();
+    ctx.strokeStyle = 'rgba(82,247,255,.95)';
+    ctx.lineWidth = 2.2;
+    ctx.shadowBlur = frameGlow;
+    ctx.shadowColor = UI.cyan;
+    ctx.beginPath();
+    ctx.moveTo(PLAY_LEFT, PLAY_TOP);
+    ctx.lineTo(PLAY_LEFT, DEATH_LINE);
+    ctx.moveTo(PLAY_RIGHT, PLAY_TOP);
+    ctx.lineTo(PLAY_RIGHT, DEATH_LINE);
+    ctx.moveTo(PLAY_LEFT, PLAY_TOP);
+    ctx.lineTo(PLAY_RIGHT, PLAY_TOP);
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(255,79,216,.72)';
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = UI.pink;
+    ctx.setLineDash([7, 6]);
+    ctx.beginPath();
+    ctx.moveTo(PLAY_LEFT, DEATH_LINE);
+    ctx.lineTo(PLAY_RIGHT, DEATH_LINE);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+
+    ctx.save();
+    const wallGlow = ctx.createLinearGradient(PLAY_LEFT, 0, PLAY_RIGHT, 0);
+    wallGlow.addColorStop(0, 'rgba(82,247,255,.16)');
+    wallGlow.addColorStop(.5, 'rgba(141,107,255,.08)');
+    wallGlow.addColorStop(1, 'rgba(255,79,216,.16)');
+    ctx.strokeStyle = wallGlow;
+    ctx.lineWidth = 7;
+    ctx.globalAlpha = 0.22;
+    ctx.beginPath();
+    ctx.moveTo(PLAY_LEFT, PLAY_TOP);
+    ctx.lineTo(PLAY_LEFT, DEATH_LINE);
+    ctx.moveTo(PLAY_RIGHT, PLAY_TOP);
+    ctx.lineTo(PLAY_RIGHT, DEATH_LINE);
+    ctx.moveTo(PLAY_LEFT, PLAY_TOP);
+    ctx.lineTo(PLAY_RIGHT, PLAY_TOP);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawBall(b) {
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(b.rotation * Math.PI / 180);
+
+    const radius = b.r;
+    const outerGlow = radius * 0.6 + 6;
+    ctx.shadowBlur = outerGlow;
+    ctx.shadowColor = b === state.active && state.mode === 'shooter' ? 'rgba(82,247,255,.95)' : 'rgba(255,79,216,.55)';
+
+    const fill = ctx.createRadialGradient(-radius * 0.35, -radius * 0.45, radius * 0.15, 0, 0, radius * 1.1);
+    fill.addColorStop(0, 'rgba(255,255,255,.98)');
+    fill.addColorStop(0.24, 'rgba(176,249,255,.96)');
+    fill.addColorStop(0.52, 'rgba(109,182,255,.88)');
+    fill.addColorStop(0.8, 'rgba(138,107,255,.88)');
+    fill.addColorStop(1, 'rgba(255,79,216,.82)');
+
+    ctx.beginPath();
+    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+    ctx.fillStyle = fill;
+    ctx.fill();
+
+    ctx.shadowBlur = 0;
+    ctx.lineWidth = Math.max(1.5, radius * 0.12);
+    ctx.strokeStyle = 'rgba(255,255,255,.86)';
+    ctx.stroke();
+
+    const sheen = ctx.createRadialGradient(-radius * 0.45, -radius * 0.55, 0, -radius * 0.28, -radius * 0.28, radius * 0.75);
+    sheen.addColorStop(0, 'rgba(255,255,255,.85)');
+    sheen.addColorStop(0.28, 'rgba(255,255,255,.28)');
+    sheen.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = sheen;
+    ctx.beginPath();
+    ctx.arc(0, 0, radius * 0.96, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#07111f';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = `800 ${Math.max(12, radius * 1.28)}px Orbitron, Arial`;
+    const shown = Math.max(0, 4 - b.f);
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = 'rgba(255,255,255,.28)';
+    ctx.fillText(String(shown), 0, 1);
+    ctx.restore();
+  }
+
+  function drawScoreLabels() {
+    ctx.save();
+    ctx.textAlign = 'left';
+
+    ctx.fillStyle = 'rgba(255,255,255,.82)';
+    ctx.font = '700 13px Orbitron, Arial';
+    ctx.letterSpacing = '0.08em';
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = 'rgba(82,247,255,.16)';
+    ctx.fillText('Score', 22, 30);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '800 28px Orbitron, Arial';
+    ctx.shadowBlur = 16;
+    ctx.shadowColor = 'rgba(82,247,255,.2)';
+    ctx.fillText(String(state.score), 20, 58);
+
+    ctx.textAlign = 'right';
+    ctx.fillStyle = 'rgba(255,255,255,.82)';
+    ctx.font = '700 13px Orbitron, Arial';
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = 'rgba(255,79,216,.16)';
+    ctx.fillText('Hi', 618, 30);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '800 28px Orbitron, Arial';
+    ctx.shadowBlur = 16;
+    ctx.shadowColor = 'rgba(255,79,216,.2)';
+    ctx.fillText(String(state.hi), 620, 58);
+
+    ctx.restore();
+  }
+
+  function drawShooter() {
+    const tip = angleToShooterTip();
+
+    ctx.save();
+    ctx.translate(SHOOTER_X, DEATH_LINE);
+
+    const baseGrad = ctx.createLinearGradient(-18, 0, 18, 55);
+    baseGrad.addColorStop(0, 'rgba(82,247,255,.95)');
+    baseGrad.addColorStop(1, 'rgba(255,79,216,.95)');
+    ctx.fillStyle = baseGrad;
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = 'rgba(82,247,255,.35)';
+    roundRect(-22, -2, 44, 60, 14);
+    ctx.fill();
+
+    ctx.shadowBlur = 0;
+    const insetGrad = ctx.createLinearGradient(0, 0, 0, 50);
+    insetGrad.addColorStop(0, '#081324');
+    insetGrad.addColorStop(1, '#040711');
+    ctx.fillStyle = insetGrad;
+    roundRect(-10, 6, 20, 46, 8);
+    ctx.fill();
+
+    ctx.restore();
+
+    if (state.mode === 'shooter') {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(82,247,255,.95)';
+      ctx.lineWidth = 2;
+      ctx.shadowBlur = 16;
+      ctx.shadowColor = UI.cyan;
+      ctx.beginPath();
+      ctx.moveTo(SHOOTER_X, SHOOTER_Y);
+      ctx.lineTo(tip.x, tip.y);
+      ctx.stroke();
+
+      ctx.strokeStyle = 'rgba(255,255,255,.35)';
+      ctx.lineWidth = 5;
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = .16;
+      ctx.beginPath();
+      ctx.moveTo(SHOOTER_X, SHOOTER_Y);
+      ctx.lineTo(tip.x, tip.y);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    ctx.save();
+    ctx.translate(tip.x, tip.y);
+    const active = state.active || { x: tip.x, y: tip.y };
+    const dx = active.x - tip.x;
+    const dy = active.y - tip.y;
+    const rad = Math.atan2(dy, dx);
+    ctx.rotate(rad - Math.PI / 2);
+
+    const arrowGrad = ctx.createLinearGradient(0, -12, 0, 10);
+    arrowGrad.addColorStop(0, '#ffffff');
+    arrowGrad.addColorStop(0.3, '#8efcff');
+    arrowGrad.addColorStop(1, '#52f7ff');
+    ctx.fillStyle = arrowGrad;
+    ctx.shadowBlur = 16;
+    ctx.shadowColor = UI.cyan;
+    ctx.beginPath();
+    ctx.moveTo(0, -13);
+    ctx.lineTo(10, 10);
+    ctx.lineTo(0, 4);
+    ctx.lineTo(-10, 10);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawParticles() {
+    for (const p of state.particles) {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, p.life / 100);
+      ctx.translate(p.x, p.y);
+
+      if (p.kind === 1) {
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = UI.cyan;
+        ctx.fillStyle = 'rgba(82,247,255,.95)';
+        ctx.fillRect(-2.5, -2.5, 5, 5);
+      } else {
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = UI.pink;
+        ctx.fillStyle = 'rgba(255,79,216,.95)';
+        ctx.beginPath();
+        ctx.arc(0, 0, 2.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    for (const d of state.debris) {
+      ctx.save();
+      ctx.translate(d.x, d.y);
+      ctx.rotate(d.rotation * Math.PI / 180);
+      if (d.textZero) {
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '800 28px Orbitron, Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowBlur = 16;
+        ctx.shadowColor = UI.pink;
+        ctx.fillText('0', 0, 0);
+      } else {
+        ctx.globalAlpha = Math.max(0, d.alpha / 100);
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = UI.cyan;
+        ctx.fillStyle = 'rgba(255,255,255,.96)';
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(d.p1.x, d.p1.y);
+        ctx.lineTo(d.p2.x, d.p2.y);
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+  }
+
+  function drawTitleCard() {
+    if (state.titleAlpha <= 0) return;
+
+    ctx.save();
+    ctx.globalAlpha = state.titleAlpha;
+
+    const x = 95, y = 115, w = 450, h = 176;
+    glassPanel(x, y, w, h, 20);
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = 'rgba(82,247,255,.2)';
+    ctx.font = '800 31px Orbitron, Arial';
+    ctx.fillText('GIMME FRICTION BABY', 320, 167);
+
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(233,229,249,.96)';
+    ctx.font = '500 16px Inter, Arial';
+    ctx.fillText('Hit Fire or Space to shoot a 3-ball.', 320, 212);
+    ctx.fillText('Each hit counts it down: 3 → 2 → 1 → pop.', 320, 239);
+    ctx.fillText('If any shot comes back below the dotted line, game over.', 320, 266);
+
+    ctx.restore();
+  }
+
+  function drawGameOverPanel() {
+    if (state.mode !== 'gomove') return;
+    const y = state.gameOverPanelY;
+    ctx.save();
+    ctx.translate(320, y);
+    glassPanel(-150, -58, 300, 116, 22);
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '800 34px Orbitron, Arial';
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = 'rgba(255,79,216,.22)';
+    ctx.fillText('GAME OVER', 0, -8);
+
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(236,232,249,.94)';
+    ctx.font = '500 18px Inter, Arial';
+    ctx.fillText('Press Fire or Space to play again', 0, 24);
+    ctx.restore();
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function glassPanel(x, y, w, h, r) {
+    ctx.save();
+    const fill = ctx.createLinearGradient(x, y, x, y + h);
+    fill.addColorStop(0, 'rgba(255,255,255,.14)');
+    fill.addColorStop(1, 'rgba(255,255,255,.05)');
+    ctx.fillStyle = fill;
+    ctx.shadowBlur = 26;
+    ctx.shadowColor = 'rgba(0,0,0,.28)';
+    roundRect(x, y, w, h, r);
+    ctx.fill();
+
+    const overlay = ctx.createLinearGradient(x, y, x + w, y + h);
+    overlay.addColorStop(0, 'rgba(82,247,255,.12)');
+    overlay.addColorStop(.6, 'rgba(141,107,255,.06)');
+    overlay.addColorStop(1, 'rgba(255,79,216,.1)');
+    ctx.fillStyle = overlay;
+    roundRect(x, y, w, h, r);
+    ctx.fill();
+
+    ctx.strokeStyle = 'rgba(255,255,255,.2)';
+    ctx.lineWidth = 1;
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = 'rgba(82,247,255,.08)';
+    roundRect(x, y, w, h, r);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(x + 20, y + 12);
+    ctx.lineTo(x + w - 20, y + 12);
+    ctx.strokeStyle = 'rgba(255,255,255,.16)';
+    ctx.shadowBlur = 0;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawPlayfield() {
+    ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+    const shakeX = state.cameraShake > 0 ? rand(-state.cameraShake, state.cameraShake) : 0;
+    const shakeY = state.cameraShake > 0 ? rand(-state.cameraShake, state.cameraShake) : 0;
+    if (state.cameraShake > 0) state.cameraShake *= 0.84;
+    if (state.cameraShake < 0.08) state.cameraShake = 0;
+
+    ctx.save();
+    ctx.translate(shakeX, shakeY);
+
+    drawSceneBackground();
+    drawPlayfieldFrame();
+    drawScoreLabels();
+
+    for (const b of state.balls) drawBall(b);
+    drawShooter();
+    drawParticles();
+    drawTitleCard();
+    drawGameOverPanel();
+
+    ctx.restore();
+  }
+
+  function tick() {
+    state.time += 1 / 60;
+    state.pulse = 0.5 + 0.5 * Math.sin(state.time * 2.5);
+
+    switch (state.mode) {
+      case 'shooter': updateShooter(); break;
+      case 'moveball': updateMoveball(); break;
+      case 'grow2': updateGrow(); break;
+      case 'gomove': updateGameOverPanel(); break;
+    }
+    updateParticles();
+    drawPlayfield();
+    requestAnimationFrame(tick);
+  }
+
+  function updateCannonSpeedFromSlider() {
+    const value = Number(speedSlider.value);
+    state.cannonSpeedMultiplier = value / 100;
+    speedValue.textContent = `${value}%`;
+  }
+
+  speedSlider.addEventListener('input', updateCannonSpeedFromSlider);
+  updateCannonSpeedFromSlider();
+
+  songChoices.addEventListener('change', (e) => {
+    const target = e.target;
+    if (target && target.name === 'song') {
+      setTrack(target.value);
+    }
+  });
+
+  fireButton.addEventListener('click', () => {
+    shootNow();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') {
+      e.preventDefault();
+      if (!e.repeat) shootNow();
+    }
+  });
+
+  canvas.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    state.mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+    state.mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+  });
+
+  canvas.addEventListener('click', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    state.mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+    state.mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+  });
+
+  restore();
+  tick();
+})();
+</script>
+</body>
+</html>
