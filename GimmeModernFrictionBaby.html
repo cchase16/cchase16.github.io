@@ -246,9 +246,8 @@
 
     .fire-wrap {
       width: min(96vw, 960px);
-      display: grid;
-      gap: 10px;
-      justify-items: center;
+      display: flex;
+      justify-content: center;
       padding-bottom: max(4px, env(safe-area-inset-bottom));
     }
 
@@ -316,104 +315,11 @@
         0 0 14px rgba(82,247,255,.18);
     }
 
-    .view-toggle {
-      width: min(100%, 420px);
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      padding: 12px 14px;
-      border-radius: 18px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.045)),
-        linear-gradient(135deg, rgba(82,247,255,.08), rgba(255,79,216,.08));
-      border: 1px solid rgba(255,255,255,.14);
-      box-shadow:
-        0 10px 28px rgba(0,0,0,.22),
-        inset 0 0 0 1px rgba(255,255,255,.02);
-    }
-
-    .view-toggle-copy {
-      display: grid;
-      gap: 2px;
-      text-align: left;
-    }
-
-    .view-toggle-title {
-      font: 700 12px/1.1 Orbitron, Inter, Arial, sans-serif;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: #fff;
-    }
-
-    .view-toggle-sub {
-      font-size: 12px;
-      color: #d4cef1;
-      line-height: 1.25;
-    }
-
-    .switch {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      cursor: pointer;
-      user-select: none;
-      flex-shrink: 0;
-    }
-
-    .switch input {
-      position: absolute;
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .switch-track {
-      width: 68px;
-      height: 38px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.05));
-      border: 1px solid rgba(255,255,255,.18);
-      box-shadow: inset 0 0 14px rgba(0,0,0,.25), 0 0 18px rgba(82,247,255,.08);
-      transition: background .18s ease, box-shadow .18s ease;
-    }
-
-    .switch-thumb {
-      position: absolute;
-      top: 4px;
-      left: 4px;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #fff, #b9fbff 42%, #52f7ff 78%);
-      box-shadow: 0 0 0 3px rgba(82,247,255,.14), 0 0 16px rgba(82,247,255,.35);
-      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
-    }
-
-    .switch input:checked + .switch-track {
-      background: linear-gradient(135deg, rgba(82,247,255,.28), rgba(255,79,216,.28));
-      box-shadow: inset 0 0 14px rgba(0,0,0,.18), 0 0 22px rgba(255,79,216,.16);
-    }
-
-    .switch input:checked + .switch-track .switch-thumb {
-      transform: translateX(30px);
-      background: radial-gradient(circle at 30% 30%, #fff, #ffd7f8 45%, #ff4fd8 80%);
-      box-shadow: 0 0 0 3px rgba(255,79,216,.16), 0 0 18px rgba(255,79,216,.38);
-    }
-
-    body.phone-layout canvas {
-      width: min(96vw, 760px);
-    }
-
     @media (max-width: 640px) {
       body { padding-top: 14px; }
       canvas { border-radius: 20px; }
       .panel { border-radius: 16px; }
       .fire-btn { width: 100%; min-width: 0; }
-      .view-toggle { width: 100%; }
-      body.phone-layout canvas {
-        width: min(96vw, 100%);
-      }
     }
   </style>
 </head>
@@ -423,16 +329,6 @@
 
     <div class="fire-wrap">
       <button id="fireButton" class="fire-btn" type="button" aria-label="Fire the cannon">Fire</button>
-      <div class="view-toggle" aria-label="Playfield view mode toggle">
-        <div class="view-toggle-copy">
-          <span class="view-toggle-title">Phone View</span>
-          <span class="view-toggle-sub">Toggle a taller, larger playfield for iPhone-friendly play.</span>
-        </div>
-        <label class="switch">
-          <input id="phoneModeToggle" type="checkbox" aria-label="Enable phone-friendly playfield mode" />
-          <span class="switch-track"><span class="switch-thumb"></span></span>
-        </label>
-      </div>
     </div>
 
     <div class="controls">
@@ -478,45 +374,18 @@
   const canvas = document.getElementById('game');
   const ctx = canvas.getContext('2d');
   const fireButton = document.getElementById('fireButton');
-  const phoneModeToggle = document.getElementById('phoneModeToggle');
   const speedSlider = document.getElementById('speedSlider');
   const speedValue = document.getElementById('speedValue');
   const songChoices = document.getElementById('songChoices');
 
-  const LAYOUTS = {
-    standard: {
-      key: 'standard',
-      width: 640,
-      height: 480,
-      shooterX: 320,
-      shooterY: 450,
-      playLeft: 130,
-      playRight: 510,
-      playTop: 15,
-      deathLine: 395,
-    },
-    phone: {
-      key: 'phone',
-      width: 640,
-      height: 760,
-      shooterX: 320,
-      shooterY: 730,
-      playLeft: 90,
-      playRight: 550,
-      playTop: 18,
-      deathLine: 655,
-    }
-  };
-
-  let layout = LAYOUTS.standard;
-  let WIDTH = layout.width;
-  let HEIGHT = layout.height;
-  let SHOOTER_X = layout.shooterX;
-  let SHOOTER_Y = layout.shooterY;
-  let PLAY_LEFT = layout.playLeft;
-  let PLAY_RIGHT = layout.playRight;
-  let PLAY_TOP = layout.playTop;
-  let DEATH_LINE = layout.deathLine;
+  const WIDTH = 640;
+  const HEIGHT = 480;
+  const SHOOTER_X = 320;
+  const SHOOTER_Y = 450;
+  const PLAY_LEFT = 130;
+  const PLAY_RIGHT = 510;
+  const PLAY_TOP = 15;
+  const DEATH_LINE = 395;
   const FRICTION = 0.975;
 
   const UI = {
@@ -612,22 +481,6 @@
     }
   };
 
-  function applyLayoutVars(nextLayout) {
-    layout = nextLayout;
-    WIDTH = layout.width;
-    HEIGHT = layout.height;
-    SHOOTER_X = layout.shooterX;
-    SHOOTER_Y = layout.shooterY;
-    PLAY_LEFT = layout.playLeft;
-    PLAY_RIGHT = layout.playRight;
-    PLAY_TOP = layout.playTop;
-    DEATH_LINE = layout.deathLine;
-    canvas.width = WIDTH;
-    canvas.height = HEIGHT;
-  }
-
-  applyLayoutVars(layout);
-
   const state = {
     mode: 'shooter',
     score: 0,
@@ -656,48 +509,6 @@
 
   function saveHi() {
     localStorage.setItem('gfb-highscore', String(state.hi));
-  }
-
-  function setPhoneMode(enabled) {
-    const oldLayout = layout;
-    const nextLayout = enabled ? LAYOUTS.phone : LAYOUTS.standard;
-    if (oldLayout.key === nextLayout.key) return;
-
-    applyLayoutVars(nextLayout);
-    document.body.classList.toggle('phone-layout', enabled);
-    localStorage.setItem('gfb-phone-mode', enabled ? '1' : '0');
-    if (phoneModeToggle.checked !== enabled) phoneModeToggle.checked = enabled;
-
-    const scaleX = nextLayout.width / oldLayout.width;
-    const scaleY = nextLayout.height / oldLayout.height;
-    const scaleBall = Math.min(scaleX, scaleY);
-
-    for (const ball of state.balls) {
-      ball.x *= scaleX;
-      ball.y *= scaleY;
-      ball.r *= scaleBall;
-    }
-
-    for (const particle of state.particles) {
-      particle.x *= scaleX;
-      particle.y *= scaleY;
-    }
-
-    for (const debris of state.debris) {
-      debris.x *= scaleX;
-      debris.y *= scaleY;
-    }
-
-    state.mouseX *= scaleX;
-    state.mouseY *= scaleY;
-
-    if (state.mode === 'shooter' && state.active) {
-      state.active.x = SHOOTER_X;
-      state.active.y = SHOOTER_Y;
-      state.active.vx = 0;
-      state.active.vy = 0;
-      state.active.r = 10;
-    }
   }
 
   const audio = {
@@ -1454,13 +1265,13 @@
     ctx.font = '700 13px Orbitron, Arial';
     ctx.shadowBlur = 10;
     ctx.shadowColor = 'rgba(255,79,216,.16)';
-    ctx.fillText('Hi', WIDTH - 22, 30);
+    ctx.fillText('Hi', 618, 30);
 
     ctx.fillStyle = '#ffffff';
     ctx.font = '800 28px Orbitron, Arial';
     ctx.shadowBlur = 16;
     ctx.shadowColor = 'rgba(255,79,216,.2)';
-    ctx.fillText(String(state.hi), WIDTH - 20, 58);
+    ctx.fillText(String(state.hi), 620, 58);
 
     ctx.restore();
   }
@@ -1726,12 +1537,6 @@
 
   speedSlider.addEventListener('input', updateCannonSpeedFromSlider);
   updateCannonSpeedFromSlider();
-
-  const savedPhoneMode = localStorage.getItem('gfb-phone-mode') === '1';
-  setPhoneMode(savedPhoneMode);
-  phoneModeToggle.addEventListener('change', () => {
-    setPhoneMode(phoneModeToggle.checked);
-  });
 
   songChoices.addEventListener('change', (e) => {
     const target = e.target;
