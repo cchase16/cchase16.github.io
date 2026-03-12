@@ -200,48 +200,79 @@
     .songs {
       position: relative;
       display: grid;
-      gap: 8px;
+      gap: 10px;
       font-size: 14px;
     }
 
-    .song-option {
-      position: relative;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.045));
-      border: 1px solid rgba(255,255,255,.1);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
-      transition: transform .14s ease, border-color .14s ease, box-shadow .14s ease;
+    .jukebox-label {
+      font: 700 12px/1 Orbitron, Inter, Arial, sans-serif;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: #d8faff;
+      text-shadow: 0 0 10px rgba(82,247,255,.22);
     }
 
-    .song-option:hover {
-      transform: translateY(-1px);
-      border-color: rgba(82,247,255,.28);
+    .jukebox-wrap {
+      position: relative;
+      padding: 12px;
+      border-radius: 16px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.1), rgba(255,255,255,.045)),
+        linear-gradient(135deg, rgba(82,247,255,.08), rgba(255,79,216,.06));
+      border: 1px solid rgba(255,255,255,.12);
       box-shadow:
         inset 0 0 0 1px rgba(255,255,255,.03),
-        0 0 18px rgba(82,247,255,.08);
+        0 0 20px rgba(82,247,255,.06);
     }
 
-    .song-option input {
-      margin-top: 3px;
-      accent-color: #52f7ff;
+    .jukebox-wrap::after {
+      content: "▼";
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      color: rgba(255,255,255,.82);
+      pointer-events: none;
+      text-shadow: 0 0 12px rgba(82,247,255,.22);
     }
 
-    .song-name {
-      font-weight: 700;
+    .song-select {
+      width: 100%;
+      appearance: none;
+      -webkit-appearance: none;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      padding: 14px 40px 14px 14px;
+      background: linear-gradient(180deg, #1e5dff, #1448cf);
+      background-color: #1e5dff;
       color: #fff;
-      display: block;
-      margin-bottom: 3px;
+      font: 700 15px/1.2 Inter, Arial, sans-serif;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.02),
+        0 0 16px rgba(82,247,255,.05);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .song-select option {
+      background: #1e5dff;
+      color: #fff;
+    }
+
+    .song-select:focus {
+      border-color: rgba(82,247,255,.45);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.03),
+        0 0 20px rgba(82,247,255,.14);
     }
 
     .song-desc {
       color: #d0caeb;
       font-size: 12px;
-      line-height: 1.35;
+      line-height: 1.45;
+      min-height: 34px;
+      padding: 0 2px;
     }
 
     .fire-wrap {
@@ -345,21 +376,17 @@
 
       <section class="panel" aria-labelledby="music-heading">
         <h2 id="music-heading">Soundtrack Select</h2>
-        <div class="songs" id="songChoices">
-          <label class="song-option">
-            <input type="radio" name="song" value="neon" checked />
-            <span>
-              <span class="song-name">Neon Rebound</span>
-              <span class="song-desc">A brisk arcade-funk loop with bright stabs and tight bounce.</span>
-            </span>
-          </label>
-          <label class="song-option">
-            <input type="radio" name="song" value="velvet" />
-            <span>
-              <span class="song-name">Velvet Orbit</span>
-              <span class="song-desc">A slower, moodier after-hours groove with its own melody and chord path.</span>
-            </span>
-          </label>
+        <div class="songs">
+          <label class="jukebox-label" for="songSelect">Juke Box</label>
+          <div class="jukebox-wrap">
+            <select id="songSelect" class="song-select" aria-label="Choose soundtrack">
+              <option value="groovewagon">Groove Wagon</option>
+              <option value="strollin">Strollin</option>
+              <option value="neon" selected>Neon Rebound</option>
+              <option value="velvet">Velvet Orbit</option>
+            </select>
+          </div>
+          <div class="song-desc" id="songDescription">A brisk arcade-funk loop with bright stabs and tight bounce.</div>
         </div>
       </section>
     </div>
@@ -376,7 +403,25 @@
   const fireButton = document.getElementById('fireButton');
   const speedSlider = document.getElementById('speedSlider');
   const speedValue = document.getElementById('speedValue');
-  const songChoices = document.getElementById('songChoices');
+  const songSelect = document.getElementById('songSelect');
+  const songDescription = document.getElementById('songDescription');
+  const grooveWagonAudio = new Audio('GameSong.mp3');
+  grooveWagonAudio.loop = true;
+  grooveWagonAudio.preload = 'auto';
+  grooveWagonAudio.load();
+
+  const strollinAudio = new Audio('Strollin.mp3');
+  strollinAudio.loop = true;
+  strollinAudio.preload = 'auto';
+  strollinAudio.load();
+
+  const fireAudio = new Audio('Fire.mp3');
+  fireAudio.preload = 'auto';
+  fireAudio.load();
+
+  const bellSplashAudio = new Audio('BellSplash.mp3');
+  bellSplashAudio.preload = 'auto';
+  bellSplashAudio.load();
 
   const WIDTH = 640;
   const HEIGHT = 480;
@@ -398,6 +443,13 @@
     bgTop: '#071022',
     bgBottom: '#04040d',
     grid: 'rgba(82,247,255,.07)'
+  };
+
+  const TRACK_DESCRIPTIONS = {
+    neon: 'A brisk arcade-funk loop with bright stabs and tight bounce.',
+    velvet: 'A slower, moodier after-hours groove with its own melody and chord path.',
+    groovewagon: 'Your uploaded loop, played as a seamless background track whenever it is selected.',
+    strollin: 'A laid-back jukebox cruise with easy swagger, pulled from your new Strollin.mp3 file.'
   };
 
   const TRACKS = {
@@ -521,10 +573,25 @@
     step: 0,
     timerId: null,
     currentTrackKey: 'neon',
+    usingUploadedLoop: false,
   };
 
   function currentTrack() {
     return TRACKS[audio.currentTrackKey] || TRACKS.neon;
+  }
+
+  function isUploadedLoopTrack(trackKey) {
+    return trackKey === 'groovewagon' || trackKey === 'strollin';
+  }
+
+  function getLoopAudio(trackKey) {
+    if (trackKey === 'groovewagon') return grooveWagonAudio;
+    if (trackKey === 'strollin') return strollinAudio;
+    return null;
+  }
+
+  function updateSongDescription() {
+    songDescription.textContent = TRACK_DESCRIPTIONS[audio.currentTrackKey] || '';
   }
 
   function ensureAudio() {
@@ -551,27 +618,85 @@
     ensureAudio();
     if (!audio.ctx) return;
     if (audio.ctx.state === 'suspended') audio.ctx.resume();
-    if (audio.started) return;
+
+    if (isUploadedLoopTrack(audio.currentTrackKey)) {
+      const loopAudio = getLoopAudio(audio.currentTrackKey);
+      if (audio.started && audio.usingUploadedLoop && loopAudio && !loopAudio.paused) return;
+      audio.started = true;
+      audio.usingUploadedLoop = true;
+      stopProceduralMusic();
+      stopLoopAudio();
+      if (loopAudio) {
+        loopAudio.currentTime = 0;
+        loopAudio.play().catch((err) => {
+          console.error('Loop track failed to play:', err);
+        });
+      }
+      return;
+    }
+
+    if (audio.started && !audio.usingUploadedLoop) return;
+    stopLoopAudio();
     audio.started = true;
+    audio.usingUploadedLoop = false;
     audio.nextNoteTime = audio.ctx.currentTime + 0.05;
     audio.step = 0;
     scheduler();
   }
 
-  function restartMusicLoop() {
-    if (!audio.ctx || !audio.started) return;
+  function stopProceduralMusic() {
     if (audio.timerId) {
       clearTimeout(audio.timerId);
       audio.timerId = null;
     }
+  }
+
+  function stopLoopAudio() {
+    [grooveWagonAudio, strollinAudio].forEach((loopAudio) => {
+      loopAudio.pause();
+      loopAudio.currentTime = 0;
+    });
+  }
+
+  function stopAllMusic() {
+    stopProceduralMusic();
+    stopLoopAudio();
+    audio.started = false;
+    audio.usingUploadedLoop = false;
+  }
+
+  function restartMusicLoop() {
+    if (!audio.ctx) return;
+
+    stopProceduralMusic();
+    stopLoopAudio();
+
+    if (isUploadedLoopTrack(audio.currentTrackKey)) {
+      audio.started = true;
+      audio.usingUploadedLoop = true;
+      if (audio.ctx.state === 'suspended') audio.ctx.resume();
+      const loopAudio = getLoopAudio(audio.currentTrackKey);
+      if (loopAudio) {
+        loopAudio.load();
+        loopAudio.currentTime = 0;
+        loopAudio.play().catch((err) => {
+          console.error('Loop track failed to play:', err);
+        });
+      }
+      return;
+    }
+
+    if (!audio.started) return;
+    audio.usingUploadedLoop = false;
     audio.nextNoteTime = audio.ctx.currentTime + 0.05;
     audio.step = 0;
     scheduler();
   }
 
   function setTrack(trackKey) {
-    if (!TRACKS[trackKey]) return;
+    if (!isUploadedLoopTrack(trackKey) && !TRACKS[trackKey]) return;
     audio.currentTrackKey = trackKey;
+    updateSongDescription();
     restartMusicLoop();
   }
 
@@ -739,22 +864,10 @@
   }
 
   function playShootSound() {
-    if (!audio.ctx) return;
-    const t = audio.ctx.currentTime;
-    const osc = audio.ctx.createOscillator();
-    const gain = audio.ctx.createGain();
-    const filter = audio.ctx.createBiquadFilter();
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(520, t);
-    osc.frequency.exponentialRampToValueAtTime(180, t + 0.08);
-    filter.type = 'lowpass';
-    filter.frequency.value = 1800;
-    gain.gain.setValueAtTime(0.0001, t);
-    gain.gain.exponentialRampToValueAtTime(0.18, t + 0.008);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.1);
-    osc.connect(filter).connect(gain).connect(audio.sfxBus);
-    osc.start(t);
-    osc.stop(t + 0.11);
+    try {
+      fireAudio.currentTime = 0;
+      fireAudio.play().catch(()=>{});
+    } catch(e) {}
   }
 
   function playGlassSound() {
@@ -842,6 +955,7 @@
     state.debris = [];
     state.titleAlpha = state.firstShot ? 0 : 1;
     state.cameraShake = 0;
+    stopAllMusic();
     createBall();
   }
 
@@ -870,6 +984,11 @@
   }
 
   function createImpactParticles(b1, b2) {
+    try {
+      bellSplashAudio.currentTime = 0;
+      bellSplashAudio.play().catch(()=>{});
+    } catch(e) {}
+
     const dx = b2.x - b1.x;
     const dy = b2.y - b1.y;
     const angle = Math.atan2(dy, dx);
@@ -1016,6 +1135,7 @@
     createExplosion(b);
     state.balls.pop();
     state.active = null;
+    stopAllMusic();
     state.mode = 'gomove';
   }
 
@@ -1538,12 +1658,11 @@
   speedSlider.addEventListener('input', updateCannonSpeedFromSlider);
   updateCannonSpeedFromSlider();
 
-  songChoices.addEventListener('change', (e) => {
-    const target = e.target;
-    if (target && target.name === 'song') {
-      setTrack(target.value);
-    }
+  songSelect.addEventListener('change', (e) => {
+    setTrack(e.target.value);
   });
+
+  updateSongDescription();
 
   fireButton.addEventListener('click', () => {
     shootNow();
