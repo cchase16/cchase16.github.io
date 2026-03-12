@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terminal Homepage Mockup</title>
+  <style>
+    :root {
+      --bg: #05080d;
+      --frame: #202b38;
+      --terminal: #1e2b3a;
+      --text: #d7dde7;
+      --muted: #aeb8c6;
+      --green: #63d09a;
+      --amber: #f0a437;
+      --line: rgba(215, 221, 231, 0.2);
+      --shadow: 0 0 0 1px rgba(255,255,255,0.03), 0 18px 55px rgba(0,0,0,0.55);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: radial-gradient(circle at top, #0c1018 0%, var(--bg) 58%);
+      color: var(--text);
+      font-family: Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      padding: 36px 20px;
+    }
+
+    .shell-wrap {
+      width: min(1180px, 100%);
+      padding: 22px;
+      border-radius: 34px;
+      background: rgba(255,255,255,0.02);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.03), 0 0 40px rgba(0,0,0,0.45);
+    }
+
+    .browser {
+      background: var(--frame);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .browser-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 16px;
+      background: #263241;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .traffic {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      opacity: 0.95;
+    }
+
+    .dot.red { background: #ef6a5b; }
+    .dot.yellow { background: #f4be4f; }
+    .dot.green { background: #62c554; }
+
+    .nav {
+      color: #a6b0bf;
+      display: flex;
+      gap: 10px;
+      font-size: 16px;
+      line-height: 1;
+      user-select: none;
+    }
+
+    .address {
+      margin-left: auto;
+      margin-right: auto;
+      width: min(470px, 54vw);
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.1);
+      color: #d9e0e8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .address .lock { opacity: 0.7; }
+    .actions { color: #a6b0bf; display: flex; gap: 14px; font-size: 18px; }
+
+    .terminal {
+      background: var(--terminal);
+      padding: 22px 28px 26px;
+      min-height: 700px;
+    }
+
+    .terminal-grid {
+      display: grid;
+      grid-template-columns: minmax(540px, 1.2fr) minmax(220px, 0.8fr);
+      gap: 34px;
+      align-items: start;
+    }
+
+    .prompt {
+      margin: 0 0 22px;
+      font-size: 17px;
+      line-height: 1.5;
+      font-weight: 600;
+    }
+
+    .amber { color: var(--amber); }
+    .green { color: var(--green); }
+
+    pre.logo {
+      margin: 6px 0 26px;
+      color: var(--text);
+      font-size: clamp(11px, 1vw, 16px);
+      line-height: 1.06;
+      white-space: pre;
+      text-shadow: 0 0 1px rgba(255,255,255,0.12);
+    }
+
+    .copy {
+      color: var(--text);
+      font-size: 17px;
+      line-height: 1.45;
+      margin: 0 0 8px;
+    }
+
+    .copy strong {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .rule {
+      color: var(--muted);
+      opacity: 0.9;
+      margin: 6px 0;
+      letter-spacing: 0.02em;
+    }
+
+    .linkish {
+      color: var(--amber);
+      text-decoration: none;
+      border-bottom: 2px dashed rgba(240, 164, 55, 0.8);
+      padding-bottom: 1px;
+    }
+
+    .linkish:hover { opacity: 0.9; }
+
+    .section-gap { height: 18px; }
+
+    .projects {
+      margin: 0 0 18px;
+      padding: 0;
+      list-style: none;
+      font-size: 17px;
+      line-height: 1.9;
+    }
+
+    .projects li {
+      display: flex;
+      gap: 14px;
+      align-items: baseline;
+      white-space: nowrap;
+    }
+
+    .projects .num {
+      color: var(--green);
+      min-width: 34px;
+    }
+
+    .projects a {
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .projects a:hover { color: var(--green); }
+
+    .status {
+      margin: 0 0 28px;
+      font-size: 17px;
+      line-height: 1.55;
+      color: var(--text);
+    }
+
+    .launch {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 300px;
+      padding: 16px 28px;
+      border: 2px solid var(--green);
+      color: var(--green);
+      text-decoration: none;
+      font-size: 17px;
+      background: transparent;
+      box-shadow: inset 0 0 0 1px rgba(99,208,154,0.12);
+      transition: transform 120ms ease, background 120ms ease, box-shadow 120ms ease;
+    }
+
+    .launch:hover {
+      background: rgba(99, 208, 154, 0.08);
+      box-shadow: inset 0 0 0 1px rgba(99,208,154,0.2), 0 0 18px rgba(99,208,154,0.12);
+      transform: translateY(-1px);
+    }
+
+    .cursor-line {
+      margin-top: 34px;
+      font-size: 17px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+    }
+
+    .cursor-box {
+      width: 14px;
+      height: 28px;
+      background: var(--green);
+      box-shadow: 0 0 10px rgba(99,208,154,0.25);
+      animation: blink 1s steps(1) infinite;
+    }
+
+    .ascii-panel {
+      display: inline-block;
+      width: fit-content;
+      color: #000;
+      background: #ffffff;
+      padding: 12px 14px;
+      border-radius: 6px;
+      opacity: 1;
+      font-family: "Courier New", "Lucida Console", Monaco, Consolas, monospace;
+      font-size: 10px;
+      line-height: 1;
+      letter-spacing: 0;
+      font-kerning: none;
+      font-variant-ligatures: none;
+      font-feature-settings: "liga" 0, "clig" 0, "kern" 0;
+      text-rendering: geometricPrecision;
+      white-space: pre;
+      margin-top: 56px;
+      user-select: none;
+    }
+
+    @keyframes blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0.15; }
+    }
+
+    @media (max-width: 980px) {
+      .terminal-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .ascii-panel {
+        margin-top: 8px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .shell-wrap { padding: 10px; }
+      .browser-top { gap: 10px; }
+      .address {
+        width: auto;
+        flex: 1;
+        min-width: 0;
+      }
+      .terminal { padding: 18px 16px 24px; min-height: auto; }
+      .prompt, .copy, .projects, .status, .cursor-line { font-size: 15px; }
+      .projects li {
+        white-space: normal;
+        line-height: 1.6;
+        margin-bottom: 6px;
+      }
+      .launch {
+        min-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell-wrap">
+    <div class="browser">
+      <div class="browser-top">
+        <div class="traffic" aria-hidden="true">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+        </div>
+        <div class="nav" aria-hidden="true">
+          <span>◧</span>
+          <span>⌄</span>
+          <span>‹</span>
+          <span>›</span>
+        </div>
+        <div class="address">
+          <span>🧑🏻</span>
+          <span>terminal.chrischase.dev</span>
+          <span class="lock">🔒</span>
+        </div>
+        <div class="actions" aria-hidden="true">
+          <span>⤴</span>
+          <span>＋</span>
+        </div>
+      </div>
+
+      <main class="terminal">
+        <div class="terminal-grid">
+          <section>
+            <p class="prompt"><span class="amber">visitor</span><span class="green">@terminal.chrischase.dev</span>:~$ welcome</p>
+
+<pre class="logo">   ________          _          ________
+  / ____/ /_  ____ _(_)____    / ____/ /_  ____ _________
+ / /   / __ \/ ___`/ / ___/   / /   / __ \/ __ `/ ___/ _ \
+/ /___/ / / / /   / (__  )   / /___/ / / / /_/ (__  )  __/
+\____/_/ /_/ /   /_/____/    \____/_/ /_/\__,_/____/\___/</pre>
+
+            <p class="copy">Welcome to my terminal homepage. (Version 1.0.0)</p>
+            <p class="rule">----</p>
+            <p class="copy">This project's source code can be seen in this project's <a class="linkish" href="https://github.com/cchase16/cchase16.github.io">GitHub repo</a>.</p>
+            <p class="rule">----</p>
+            <p class="copy">For a list of available commands, type <span class="green">'help'</span>.</p>
+
+            <div class="section-gap"></div>
+
+            <p class="prompt"><span class="amber">visitor</span><span class="green">@terminal.chrischase.dev</span>:~$ ls projects</p>
+
+            <ul class="projects">
+              <li><span class="num">[1]</span> <a href="#">Gimme Friction</a></li>
+              <li><span class="num">[2]</span> <a href="#">Cannon Lab</a></li>
+              <li><span class="num">[3]</span> <a href="#">Music Sequencer</a></li>
+              <li><span class="num">[4]</span> <a href="#">Random Generator</a></li>
+              <li><span class="num">[5]</span> <a href="#">Prototype Build</a></li>
+            </ul>
+
+            <p class="prompt"><span class="amber">visitor</span><span class="green">@terminal.chrischase.dev</span>:~$ run gimme-friction</p>
+            <p class="status">Loading Gimme Friction...</p>
+            <a class="launch" href="/GimmeModernFrictionBaby.html">[ Launch Project ]</a>
+
+            <div class="cursor-line">
+              <span class="green">&gt;</span>
+              <span class="cursor-box" aria-hidden="true"></span>
+            </div>
+          </section>
+
+          <aside class="ascii-panel" aria-hidden="true">
+                                               
+                  @@@@@@@@@                    
+                 @@@@@@@@@@@@                  
+          @@@  @@@@@@@@@@@@@@@@                
+       @@@@@@@@@@@@@@@@@@@@@@@@@@@             
+     @@@@@@@ @@@@@@@@@ @@@@@@@@@@@@@           
+    @@@@@@@@@@@@@@@@@@  @@@@@@@@@@@@@          
+    @@@@@@@@@@@@ @@@@@@@@@@@@@@@@ @@@          
+    @@@@@@@@@@@   @@@@@@@@@@@@@@@@@@@@         
+    @@@@@@@@@@         @@@@@@@@@@@@@@@         
+    @@@@@@@@@               @@@@@@@@@@         
+     @@@@@@@                     @@@@          
+     @@@@@@@@@@@@@@    @@@@@@@@@ @@@@          
+      @@@@@@@@@@@@@@   @@@@@@@@@@@@@@          
+       @@@@@@@@@@@@@    @@@@@@@@@ @@@          
+       @@@@@@@@@@@@@       @@@@    @           
+       @@@@@     @@                @           
+       @@@        @@                           
+       @@@@      @@@@@@@@                      
+       @@@@     @@@@@@      @                  
+       @@@@@@@@@@@@@@@@       @                
+         @@@@@@@@@@       @@@@                 
+         @@@@@@@@@@@@@@@@@   @                 
+          @@@@@@@@@@@@@@     @                 
+          @@@@@@@@@@@@@@@   @@@@@@             
+           @@@@@@@@@         @@@@@@            
+        @@@@@@@@@            @@@@  @@@@@       
+   @@@@@@@@@@@@@@@@@@      @@@@@@   @@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@    @@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      @@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ @@   @@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@   @@  @@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@       @@@@@@@@@@@@@
+@@@@@@@@@@@@@@@@@@@@@@@          @@@@@@@@@@@@@@
+</aside>
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
