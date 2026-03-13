@@ -295,14 +295,24 @@
 
     const audio = {
       enabled: false,
+      ambient: new Audio('Sounds/AmbientNoise.mp3'),
       swing: new Audio('Sounds/GolfSwingAndHit.mp3'),
       windowBreak: new Audio('Sounds/WindowBreak.mp3'),
+      zombieHit: new Audio('Sounds/ZombieHitByBall.mp3'),
+      zombieFalls: new Audio('Sounds/ZombieFalls.mp3'),
     };
 
+    audio.ambient.preload = 'auto';
+    audio.ambient.loop = true;
     audio.swing.preload = 'auto';
     audio.windowBreak.preload = 'auto';
+    audio.zombieHit.preload = 'auto';
+    audio.zombieFalls.preload = 'auto';
+    audio.ambient.volume = 0.4;
     audio.swing.volume = 0.72;
     audio.windowBreak.volume = 0.82;
+    audio.zombieHit.volume = 0.9;
+    audio.zombieFalls.volume = 0.92;
 
     let w = 0;
     let h = 0;
@@ -327,6 +337,8 @@
       cars: [],
       zombies: [],
       zombieHordes: [],
+      windowZombies: [],
+      windowZombieTimer: 0,
       messages: [],
       keys: new Set(),
       time: 0,
@@ -364,6 +376,7 @@
       state.cars = [];
       state.zombies = [];
       state.zombieHordes = [];
+      state.windowZombies = [];
 
       const streetY = h * 0.72;
       const roadH = h * 0.08;
@@ -474,6 +487,7 @@
         });
       }
 
+      state.windowZombieTimer = rand(2.5, 5.5);
       state.sweetStart = 0.58;
       state.sweetWidth = 0.12;
       syncMeterUI();
@@ -493,6 +507,7 @@
       state.messages = [];
       state.wind = rand(-0.05, 0.05);
       state.gameOver = false;
+      state.windowZombieTimer = rand(2.5, 5.5);
       buildWorld();
       flashMessage('New round. Rooftop range is live.', 1300);
       updateHud();
@@ -531,7 +546,21 @@
     function unlockAudio() {
       if (audio.enabled) return;
       audio.enabled = true;
-      for (const sound of [audio.swing, audio.windowBreak]) {
+
+      audio.ambient.muted = true;
+      const ambientPromise = audio.ambient.play();
+      if (ambientPromise && typeof ambientPromise.then === 'function') {
+        ambientPromise.then(() => {
+          audio.ambient.muted = false;
+          audio.ambient.volume = 0.4;
+        }).catch(() => {
+          audio.ambient.muted = false;
+        });
+      } else {
+        audio.ambient.muted = false;
+      }
+
+      for (const sound of [audio.swing, audio.windowBreak, audio.zombieHit, audio.zombieFalls]) {
         sound.muted = true;
         const playPromise = sound.play();
         if (playPromise && typeof playPromise.then === 'function') {
@@ -574,9 +603,24 @@
       let best = null;
       let bestDist = Infinity;
 
+      for (const windowZombie of state.windowZombies) {
+        if (!windowZombie.active || windowZombie.hit) continue;
+        const tx = windowZombie.x;
+        const ty = windowZombie.y;
+        const dx = tx - aim.x;
+        const dy = ty - aim.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = { type: 'windowZombie', obj: windowZombie, x: tx, y: ty };
+        }
+      }
+
       for (const building of state.buildings) {
         for (const win of building.windows) {
           if (win.broken) continue;
+          const occupiedByZombie = state.windowZombies.some((windowZombie) => windowZombie.active && !windowZombie.hit && windowZombie.window === win);
+          if (occupiedByZombie) continue;
           const tx = win.x + win.w / 2;
           const ty = win.y + win.h / 2;
           const dx = tx - aim.x;
@@ -589,7 +633,6 @@
         }
       }
 
-      const roadTop = h * 0.64;
       for (const car of state.cars) {
         if (car.broken) continue;
         const tx = car.x + car.w / 2;
@@ -730,7 +773,24 @@
       state.bestShot = fromHorde ? 'Zombie Horde' : 'Zombie';
       state.combo += 1;
       spawnDebris(sx, sy, fromHorde ? 14 : 18, 'rgba(112, 196, 96, 0.9)');
+      playSound(audio.zombieHit, { volume: 0.9 });
       flashMessage((fromHorde ? 'Horde hit! +' : 'Zombie down! +') + (pts * (state.combo - 1)), 900);
+      return true;
+    }
+
+    function hitWindowZombie(windowZombie, sx, sy, quality) {
+      if (!windowZombie.active || windowZombie.hit) return false;
+      windowZombie.hit = true;
+      windowZombie.active = false;
+      windowZombie.fallVy = 110;
+      windowZombie.fade = 1;
+      const pts = 1000;
+      state.score += pts * state.combo;
+      state.bestShot = 'Window Zombie';
+      state.combo += 1;
+      spawnDebris(sx, sy, 24, 'rgba(126, 214, 92, 0.92)');
+      playSound(audio.zombieFalls, { volume: 0.92 });
+      flashMessage('Window zombie dropped! +' + (pts * (state.combo - 1)), 1200);
       return true;
     }
 
@@ -777,6 +837,41 @@
       };
     }
 
+    function spawnWindowZombie() {
+      const candidates = [];
+      for (const building of state.buildings) {
+        for (const win of building.windows) {
+          if (win.broken) continue;
+          if (win.w < 12 || win.h < 14) continue;
+          if (state.windowZombies.some((windowZombie) => !windowZombie.hit && windowZombie.window === win)) continue;
+          candidates.push(win);
+        }
+      }
+
+      if (!candidates.length) {
+        state.windowZombieTimer = rand(5, 8);
+        return;
+      }
+
+      const win = candidates[Math.floor(Math.random() * candidates.length)];
+      state.windowZombies.push({
+        window: win,
+        x: win.x + win.w / 2,
+        y: win.y + win.h * 0.62,
+        w: Math.max(14, win.w * 0.78),
+        h: Math.max(18, win.h * 1.28),
+        sway: rand(0, Math.PI * 2),
+        age: 0,
+        duration: rand(9.2, 10.8),
+        active: true,
+        hit: false,
+        fallVy: 0,
+        fade: 1,
+      });
+
+      state.windowZombieTimer = rand(4.5, 8.5);
+    }
+
     function update(dt) {
       state.time += dt;
 
@@ -810,6 +905,30 @@
         if (zombie.speed < 0 && zombie.x < -40) zombie.x = w + 40;
       }
 
+      state.windowZombieTimer -= dt;
+      if (state.windowZombieTimer <= 0) {
+        spawnWindowZombie();
+      }
+
+      for (let i = state.windowZombies.length - 1; i >= 0; i--) {
+        const windowZombie = state.windowZombies[i];
+        windowZombie.age += dt;
+        windowZombie.sway += dt * 4.8;
+        if (windowZombie.hit) {
+          windowZombie.fallVy += 420 * dt;
+          windowZombie.y += windowZombie.fallVy * dt;
+          windowZombie.fade -= dt * 1.2;
+          if (windowZombie.fade <= 0) {
+            state.windowZombies.splice(i, 1);
+          }
+          continue;
+        }
+        if (windowZombie.age >= windowZombie.duration) {
+          windowZombie.active = false;
+          state.windowZombies.splice(i, 1);
+        }
+      }
+
       for (const horde of state.zombieHordes) {
         horde.x += horde.speed * dt;
         const hordeWidth = horde.members.length * 12 + 20;
@@ -840,6 +959,8 @@
               didHit = hitZombie(shot.target.obj, shot.target.x, shot.target.y, 1, false);
             } else if (shot.target.type === 'hordeZombie') {
               didHit = hitZombie(shot.target.obj, shot.target.x, shot.target.y, 1, true);
+            } else if (shot.target.type === 'windowZombie') {
+              didHit = hitWindowZombie(shot.target.obj, shot.target.x, shot.target.y, 1);
             }
           }
         } else {
@@ -865,6 +986,18 @@
             for (const car of state.cars) {
               if (p.x >= car.x && p.x <= car.x + car.w && p.y >= car.y && p.y <= car.y + car.h) {
                 didHit = hitCar(car, p.x, p.y, shot.quality);
+                if (didHit) break;
+              }
+            }
+          }
+
+          if (!didHit) {
+            for (const windowZombie of state.windowZombies) {
+              if (!windowZombie.active || windowZombie.hit) continue;
+              const hitW = windowZombie.w;
+              const hitH = windowZombie.h;
+              if (p.x >= windowZombie.x - hitW / 2 && p.x <= windowZombie.x + hitW / 2 && p.y >= windowZombie.y - hitH / 2 && p.y <= windowZombie.y + hitH / 2) {
+                didHit = hitWindowZombie(windowZombie, windowZombie.x, windowZombie.y, shot.quality);
                 if (didHit) break;
               }
             }
@@ -1019,6 +1152,34 @@
         }
       }
 
+      function drawWindowZombie(windowZombie) {
+        const bob = Math.sin(state.time * 5 + windowZombie.sway) * 1.2;
+        const zx = windowZombie.x;
+        const zy = windowZombie.y + bob;
+        const alpha = Math.max(0, windowZombie.fade ?? 1);
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = 'rgba(18, 22, 34, 0.72)';
+        ctx.fillRect(windowZombie.window.x + 1, windowZombie.window.y + 1, windowZombie.window.w - 2, windowZombie.window.h - 2);
+        ctx.fillStyle = '#87a86e';
+        ctx.beginPath();
+        ctx.arc(zx, zy - 10, 5.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#6a8358';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(zx, zy - 4);
+        ctx.lineTo(zx, zy + 10);
+        ctx.moveTo(zx - 6, zy + 1);
+        ctx.lineTo(zx + 6, zy + 3);
+        ctx.moveTo(zx, zy + 10);
+        ctx.lineTo(zx - 5, zy + 17);
+        ctx.moveTo(zx, zy + 10);
+        ctx.lineTo(zx + 5, zy + 17);
+        ctx.stroke();
+        ctx.restore();
+      }
+
       function drawZombieFigure(zx, zy, s, hit = false) {
         if (hit) {
           ctx.strokeStyle = '#506344';
@@ -1056,6 +1217,10 @@
         const zx = zombie.x;
         const zy = zombie.y + bob;
         drawZombieFigure(zx, zy, zombie.size, zombie.hit);
+      }
+
+      for (const windowZombie of state.windowZombies) {
+        drawWindowZombie(windowZombie);
       }
 
       for (const horde of state.zombieHordes) {
