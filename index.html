@@ -146,18 +146,59 @@
     }
 
     @media (max-width: 760px) {
-      .shell-wrap { padding: 10px; }
+      body {
+        display: block;
+        padding: 0;
+      }
+      .shell-wrap {
+        width: 100%;
+        padding: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+      }
+      .browser {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+      }
       .browser-top { gap: 10px; }
       .address {
         width: auto;
         flex: 1;
         min-width: 0;
       }
+      .actions,
+      .nav span:first-child,
+      .nav span:nth-child(2) {
+        display: none;
+      }
       .terminal { padding: 18px 16px 24px; min-height: auto; }
       .terminal-output,
       .terminal-input-row { font-size: 15px; }
-      .launch {
-        min-width: 100%;
+      .terminal-output {
+        min-height: 280px;
+        margin-bottom: 18px;
+      }
+      .terminal-input-row {
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .terminal-input-wrap {
+        min-width: 0;
+      }
+      .terminal-help {
+        font-size: 13px;
+      }
+      .ascii-panel {
+        margin-top: 20px;
+        max-width: 100%;
+        overflow-x: auto;
+      }
+      .mobile-controls,
+      .mobile-projects,
+      .mobile-only {
+        display: block;
       }
     }
 
@@ -268,6 +309,109 @@
       margin-top: 56px;
       user-select: none;
     }
+
+    .mobile-controls,
+    .mobile-projects {
+      display: none;
+    }
+
+    .mobile-controls {
+      margin-top: 22px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+    }
+
+    .mobile-controls-header,
+    .mobile-projects-header {
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .mobile-control-bar {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .mobile-btn,
+    .project-btn {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font: inherit;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .mobile-btn {
+      min-height: 46px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .project-btn {
+      width: 100%;
+      padding: 14px 16px;
+      text-align: left;
+      margin-bottom: 10px;
+    }
+
+    .project-btn:last-child {
+      margin-bottom: 0;
+    }
+
+    .project-btn-title {
+      display: block;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .project-btn-subtitle {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .mobile-btn:active,
+    .project-btn:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    .mobile-btn:hover,
+    .project-btn:hover {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(99,208,154,0.28);
+    }
+
+    .mobile-projects {
+      margin-top: 18px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.025);
+    }
+
+    .mobile-empty {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .mobile-only {
+      display: none;
+    }
+
   </style>
 </head>
 <body>
@@ -312,7 +456,8 @@
               <div class="output-line system">----</div>
               <div class="output-line">This project's source code can be seen in this project's <a class="linkish" href="https://github.com/cchase16/cchase16.github.io" target="_blank" rel="noopener noreferrer">GitHub repo</a>.</div>
               <div class="output-line system">----</div>
-              <div class="output-line">Available commands: <span class="green">help</span>, <span class="green">list</span>, <span class="green">run [project name]</span>, <span class="green">clear</span>.</div>              
+              <div class="output-line">Available proof-of-concept commands: <span class="green">help</span>, <span class="green">list</span>, <span class="green">run [project name]</span>, <span class="green">clear</span>.</div>
+              <div class="output-line">Project names now load from <span class="green">siteconfig.xml</span>.</div>
             </div>
 
             <div class="terminal-input-row">
@@ -333,6 +478,20 @@
             </div>
 
             <div class="terminal-help">Examples: <span class="green">run gimme friction</span> or <span class="green">run apocalypse golf</span>. Use <span class="green">↑ ↓</span> for history and <span class="green">Tab</span> to autocomplete.</div>
+
+            <div class="mobile-controls mobile-only" id="mobileControls">
+              <div class="mobile-controls-header">Quick actions</div>
+              <div class="mobile-control-bar">
+                <button class="mobile-btn" type="button" data-command="help">Help</button>
+                <button class="mobile-btn" type="button" data-command="list">List</button>
+                <button class="mobile-btn" type="button" data-command="clear">Clear</button>
+              </div>
+            </div>
+
+            <div class="mobile-projects mobile-only" id="mobileProjects">
+              <div class="mobile-projects-header">Tap to run a project</div>
+              <div id="mobileProjectsList" class="mobile-empty">Loading projects…</div>
+            </div>
           </section>
 
           <aside class="ascii-panel" aria-hidden="true">
@@ -380,11 +539,42 @@
     const output = document.getElementById('terminalOutput');
     const input = document.getElementById('terminalInput');
     const cursor = document.getElementById('terminalCursor');
+    const mobileControls = document.getElementById('mobileControls');
+    const mobileProjectsList = document.getElementById('mobileProjectsList');
     const promptHTML = '<span class="amber">visitor</span><span class="green">@terminal.chrischase.dev</span>:~$ ';
+    const mobileQuery = window.matchMedia('(max-width: 760px)');
 
     let projects = [];
     let commandHistory = [];
     let historyIndex = -1;
+
+
+    function isMobileViewport() {
+      return mobileQuery.matches;
+    }
+
+    function focusInputAtEnd() {
+      input.focus({ preventScroll: true });
+      const end = input.value.length;
+      input.setSelectionRange(end, end);
+      syncCursor();
+    }
+
+    function renderMobileProjects() {
+      if (!mobileProjectsList) return;
+
+      if (!projects.length) {
+        mobileProjectsList.innerHTML = '<div class="mobile-empty">No projects available yet.</div>';
+        return;
+      }
+
+      mobileProjectsList.innerHTML = projects.map((project) => `
+        <button class="project-btn" type="button" data-project="${escapeHTML(projectDisplayName(project))}">
+          <span class="project-btn-title">${escapeHTML(projectDisplayName(project))}</span>
+          <span class="project-btn-subtitle">${escapeHTML(project.url)}</span>
+        </button>
+      `).join('');
+    }
 
     function appendLine(content, className = '') {
       const line = document.createElement('div');
@@ -392,7 +582,7 @@
       line.innerHTML = content;
       output.appendChild(line);
       output.scrollTop = output.scrollHeight;
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      window.scrollTo({ top: document.body.scrollHeight, behavior: isMobileViewport() ? 'auto' : 'smooth' });
     }
 
     function escapeHTML(value) {
@@ -594,12 +784,41 @@
         })).filter((project) => project.url);
 
         projects = parsedProjects;
+        renderMobileProjects();
 
         appendLine(`Loaded ${projects.length} project${projects.length === 1 ? '' : 's'} from <span class="green">siteconfig.xml</span>.`, 'system');
       } catch (error) {
+        renderMobileProjects();
         appendLine('Could not load <span class="green">siteconfig.xml</span>. Make sure the file is in the same folder and served over HTTP.', 'error');
       }
     }
+
+
+    mobileControls?.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-command]');
+      if (!button) return;
+
+      const command = button.getAttribute('data-command') || '';
+      if (command === 'clear') {
+        handleCommand(command);
+      } else {
+        appendLine(`<span class="system">Tapped quick action:</span> <span class="green">${escapeHTML(command)}</span>`, 'system');
+        handleCommand(command);
+      }
+      setInputValue('');
+      focusInputAtEnd();
+    });
+
+    mobileProjectsList?.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-project]');
+      if (!button) return;
+
+      const projectName = button.getAttribute('data-project') || '';
+      appendLine(`<span class="system">Tapped project:</span> <span class="green">${escapeHTML(projectName)}</span>`, 'system');
+      handleCommand(`run ${projectName}`);
+      setInputValue('');
+      focusInputAtEnd();
+    });
 
     input.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
@@ -631,13 +850,20 @@
     input.addEventListener('focus', syncCursor);
     input.addEventListener('blur', syncCursor);
 
-    document.addEventListener('click', () => input.focus());
+    document.addEventListener('click', (event) => {
+      if (event.target.closest('.mobile-btn, .project-btn, a')) {
+        return;
+      }
+      focusInputAtEnd();
+    });
 
     window.addEventListener('load', async () => {
-      input.focus();
-      syncCursor();
+      renderMobileProjects();
+      focusInputAtEnd();
       await loadProjectsFromXML();
     });
+
+    mobileQuery.addEventListener?.('change', syncCursor);
   </script>
 </body>
 </html>
