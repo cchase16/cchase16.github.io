@@ -118,13 +118,6 @@
       align-items: start;
     }
 
-    .prompt {
-      margin: 0 0 22px;
-      font-size: 17px;
-      line-height: 1.5;
-      font-weight: 600;
-    }
-
     .amber { color: var(--amber); }
     .green { color: var(--green); }
 
@@ -135,129 +128,6 @@
       line-height: 1.06;
       white-space: pre;
       text-shadow: 0 0 1px rgba(255,255,255,0.12);
-    }
-
-    .copy {
-      color: var(--text);
-      font-size: 17px;
-      line-height: 1.45;
-      margin: 0 0 8px;
-    }
-
-    .copy strong {
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .rule {
-      color: var(--muted);
-      opacity: 0.9;
-      margin: 6px 0;
-      letter-spacing: 0.02em;
-    }
-
-    .linkish {
-      color: var(--amber);
-      text-decoration: none;
-      border-bottom: 2px dashed rgba(240, 164, 55, 0.8);
-      padding-bottom: 1px;
-    }
-
-    .linkish:hover { opacity: 0.9; }
-
-    .section-gap { height: 18px; }
-
-    .projects {
-      margin: 0 0 18px;
-      padding: 0;
-      list-style: none;
-      font-size: 17px;
-      line-height: 1.9;
-    }
-
-    .projects li {
-      display: flex;
-      gap: 14px;
-      align-items: baseline;
-      white-space: nowrap;
-    }
-
-    .projects .num {
-      color: var(--green);
-      min-width: 34px;
-    }
-
-    .projects a {
-      color: var(--text);
-      text-decoration: none;
-    }
-
-    .projects a:hover { color: var(--green); }
-
-    .status {
-      margin: 0 0 28px;
-      font-size: 17px;
-      line-height: 1.55;
-      color: var(--text);
-    }
-
-    .launch {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 300px;
-      padding: 16px 28px;
-      border: 2px solid var(--green);
-      color: var(--green);
-      text-decoration: none;
-      font-size: 17px;
-      background: transparent;
-      box-shadow: inset 0 0 0 1px rgba(99,208,154,0.12);
-      transition: transform 120ms ease, background 120ms ease, box-shadow 120ms ease;
-    }
-
-    .launch:hover {
-      background: rgba(99, 208, 154, 0.08);
-      box-shadow: inset 0 0 0 1px rgba(99,208,154,0.2), 0 0 18px rgba(99,208,154,0.12);
-      transform: translateY(-1px);
-    }
-
-    .cursor-line {
-      margin-top: 34px;
-      font-size: 17px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 600;
-    }
-
-    .cursor-box {
-      width: 14px;
-      height: 28px;
-      background: var(--green);
-      box-shadow: 0 0 10px rgba(99,208,154,0.25);
-      animation: blink 1s steps(1) infinite;
-    }
-
-    .ascii-panel {
-      display: inline-block;
-      width: fit-content;
-      color: #000;
-      background: #ffffff;
-      padding: 12px 14px;
-      border-radius: 6px;
-      opacity: 1;
-      font-family: "Courier New", "Lucida Console", Monaco, Consolas, monospace;
-      font-size: 10px;
-      line-height: 1;
-      letter-spacing: 0;
-      font-kerning: none;
-      font-variant-ligatures: none;
-      font-feature-settings: "liga" 0, "clig" 0, "kern" 0;
-      text-rendering: geometricPrecision;
-      white-space: pre;
-      margin-top: 56px;
-      user-select: none;
     }
 
     @keyframes blink {
@@ -284,17 +154,12 @@
         min-width: 0;
       }
       .terminal { padding: 18px 16px 24px; min-height: auto; }
-      .prompt, .copy, .projects, .status, .cursor-line { font-size: 15px; }
-      .projects li {
-        white-space: normal;
-        line-height: 1.6;
-        margin-bottom: 6px;
-      }
+      .terminal-output,
+      .terminal-input-row { font-size: 15px; }
       .launch {
         min-width: 100%;
       }
     }
-  
 
     .terminal-output {
       display: flex;
@@ -303,6 +168,7 @@
       margin-bottom: 26px;
       font-size: 17px;
       line-height: 1.55;
+      min-height: 360px;
     }
 
     .output-line {
@@ -333,7 +199,7 @@
       font-size: 17px;
       font-weight: 600;
       margin-top: 8px;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
     }
 
     .terminal-label {
@@ -344,6 +210,9 @@
       position: relative;
       flex: 1;
       min-width: 260px;
+      display: flex;
+      align-items: center;
+      min-height: 28px;
     }
 
     .terminal-input {
@@ -353,7 +222,7 @@
       outline: none;
       color: var(--text);
       font: inherit;
-      caret-color: var(--green);
+      caret-color: transparent;
       padding: 0;
       margin: 0;
     }
@@ -362,12 +231,43 @@
       color: rgba(174, 184, 198, 0.55);
     }
 
+    .cursor-box {
+      display: inline-block;
+      width: 11px;
+      height: 1.2em;
+      background: var(--green);
+      box-shadow: 0 0 10px rgba(99,208,154,0.25);
+      animation: blink 1s steps(1) infinite;
+      margin-left: 1px;
+      flex: 0 0 auto;
+    }
+
     .terminal-help {
       margin-top: 18px;
       color: var(--muted);
       font-size: 14px;
     }
 
+    .ascii-panel {
+      display: inline-block;
+      width: fit-content;
+      color: #000;
+      background: #ffffff;
+      padding: 12px 14px;
+      border-radius: 6px;
+      opacity: 1;
+      font-family: "Courier New", "Lucida Console", Monaco, Consolas, monospace;
+      font-size: 10px;
+      line-height: 1;
+      letter-spacing: 0;
+      font-kerning: none;
+      font-variant-ligatures: none;
+      font-feature-settings: "liga" 0, "clig" 0, "kern" 0;
+      text-rendering: geometricPrecision;
+      white-space: pre;
+      margin-top: 56px;
+      user-select: none;
+    }
   </style>
 </head>
 <body>
@@ -408,12 +308,12 @@
 / /___/ / / / /   / (__  )   / /___/ / / / /_/ (__  )  __/
 \____/_/ /_/_/   /_/____/    \____/_/ /_/\__,_/____/\___/</pre>
 
-              <div class="output-line">Welcome to my terminal homepage. (Version 1.1.0)</div>
+              <div class="output-line">Welcome to my terminal homepage. (Version 1.2.0)</div>
               <div class="output-line system">----</div>
               <div class="output-line">This project's source code can be seen in this project's <a class="linkish" href="https://github.com/cchase16/cchase16.github.io" target="_blank" rel="noopener noreferrer">GitHub repo</a>.</div>
               <div class="output-line system">----</div>
               <div class="output-line">Available proof-of-concept commands: <span class="green">help</span>, <span class="green">list</span>, <span class="green">run [project name]</span>, <span class="green">clear</span>.</div>
-              <div class="output-line">Type <span class="green">list</span> to see the available projects.</div>
+              <div class="output-line">Project names now load from <span class="green">siteconfig.xml</span>.</div>
             </div>
 
             <div class="terminal-input-row">
@@ -429,15 +329,15 @@
                   placeholder="try: list"
                   aria-label="Terminal command line"
                 />
+                <span class="cursor-box" id="terminalCursor" aria-hidden="true"></span>
               </div>
-              <span class="cursor-box" aria-hidden="true"></span>
             </div>
 
-            <div class="terminal-help">Examples: <span class="green">run gimme friction</span> or <span class="green">run apocalypse golf</span></div>
+            <div class="terminal-help">Examples: <span class="green">run gimme friction</span> or <span class="green">run apocalypse golf</span>. Use <span class="green">↑ ↓</span> for history and <span class="green">Tab</span> to autocomplete.</div>
           </section>
 
           <aside class="ascii-panel" aria-hidden="true">
-                                               
+
                   @@@@@@@@@                    
                  @@@@@@@@@@@@                  
           @@@  @@@@@@@@@@@@@@@@                
@@ -478,22 +378,14 @@
   </div>
 
   <script>
-    const projects = [
-      {
-        name: 'Gimme Friction',
-        slug: 'gimme friction',
-        file: 'GimmeModernFrictionBaby.html'
-      },
-      {
-        name: 'Apocalypse Golf',
-        slug: 'apocalypse golf',
-        file: 'ApocalypseGolfGame.html'
-      }
-    ];
-
     const output = document.getElementById('terminalOutput');
     const input = document.getElementById('terminalInput');
+    const cursor = document.getElementById('terminalCursor');
     const promptHTML = '<span class="amber">visitor</span><span class="green">@terminal.chrischase.dev</span>:~$ ';
+
+    let projects = [];
+    let commandHistory = [];
+    let historyIndex = -1;
 
     function appendLine(content, className = '') {
       const line = document.createElement('div');
@@ -504,7 +396,16 @@
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
 
-    function normalizeName(value) {
+    function escapeHTML(value) {
+      return value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function normalizeName(value = '') {
       return value
         .toLowerCase()
         .trim()
@@ -512,33 +413,60 @@
         .replace(/[-_]+/g, ' ');
     }
 
+    function syncCursor() {
+      const textWidth = input.value.length === 0 ? 0 : `${Math.max(input.value.length, 1)}ch`;
+      input.style.width = textWidth;
+      cursor.style.display = document.activeElement === input ? 'inline-block' : 'none';
+    }
+
+    function setInputValue(value) {
+      input.value = value;
+      const end = value.length;
+      input.setSelectionRange(end, end);
+      syncCursor();
+    }
+
+    function projectDisplayName(project) {
+      return project.label || project.id || project.url;
+    }
+
     function renderList() {
+      if (!projects.length) {
+        appendLine('No projects loaded from siteconfig.xml.', 'error');
+        return;
+      }
+
       appendLine('Projects:', 'success');
       projects.forEach((project, index) => {
-        appendLine(`[${index + 1}] ${project.name}  →  ${project.file}`);
+        appendLine(`[${index + 1}] ${projectDisplayName(project)}  →  ${project.url}`);
       });
     }
 
     function renderHelp() {
       appendLine('Supported commands:', 'success');
       appendLine('help  →  show available commands');
-      appendLine('list  →  show proof-of-concept project list');
+      appendLine('list  →  show project list from siteconfig.xml');
       appendLine('run [project name]  →  open a project file');
       appendLine('clear  →  clear terminal output');
     }
 
     function runProject(projectName) {
       const normalized = normalizeName(projectName);
-      const project = projects.find((item) => normalizeName(item.slug) === normalized || normalizeName(item.name) === normalized);
+      const project = projects.find((item) => {
+        const names = [item.id, item.label, item.url]
+          .filter(Boolean)
+          .map((value) => normalizeName(value));
+        return names.includes(normalized);
+      });
 
       if (!project) {
-        appendLine(`Project not found: ${projectName}`, 'error');
+        appendLine(`Project not found: ${escapeHTML(projectName)}`, 'error');
         appendLine('Type <span class="green">list</span> to see available projects.', 'system');
         return;
       }
 
-      appendLine(`Opening ${project.name}...`, 'success');
-      window.location.href = project.file;
+      appendLine(`Opening ${escapeHTML(projectDisplayName(project))}...`, 'success');
+      window.location.href = project.url;
     }
 
     function clearTerminal() {
@@ -546,11 +474,73 @@
       appendLine('Terminal cleared.', 'system');
     }
 
+    function getProjectNameMatches(partial) {
+      const normalized = normalizeName(partial);
+      return projects.filter((project) => {
+        const candidates = [project.label, project.id].filter(Boolean);
+        return candidates.some((candidate) => normalizeName(candidate).startsWith(normalized));
+      });
+    }
+
+    function autocompleteProject() {
+      const command = input.value;
+      const runMatch = command.match(/^run\s+(.*)$/i);
+
+      if (!runMatch) {
+        return false;
+      }
+
+      const partialName = runMatch[1].trim();
+      if (!partialName) {
+        return false;
+      }
+
+      const matches = getProjectNameMatches(partialName);
+
+      if (matches.length === 1) {
+        setInputValue(`run ${projectDisplayName(matches[0])}`);
+        return true;
+      }
+
+      if (matches.length > 1) {
+        appendLine(promptHTML + escapeHTML(command), 'command');
+        appendLine(`Matches: ${matches.map((project) => escapeHTML(projectDisplayName(project))).join(', ')}`, 'system');
+        return true;
+      }
+
+      return false;
+    }
+
+    function handleHistoryNavigation(direction) {
+      if (!commandHistory.length) return;
+
+      if (direction === 'up') {
+        if (historyIndex < commandHistory.length - 1) {
+          historyIndex += 1;
+        }
+      } else if (direction === 'down') {
+        if (historyIndex >= 0) {
+          historyIndex -= 1;
+        }
+      }
+
+      if (historyIndex === -1) {
+        setInputValue('');
+        return;
+      }
+
+      const historyCommand = commandHistory[commandHistory.length - 1 - historyIndex];
+      setInputValue(historyCommand);
+    }
+
     function handleCommand(rawCommand) {
       const command = rawCommand.trim();
       if (!command) return;
 
-      appendLine(promptHTML + command, 'command');
+      commandHistory.push(command);
+      historyIndex = -1;
+
+      appendLine(promptHTML + escapeHTML(command), 'command');
 
       const lower = command.toLowerCase();
 
@@ -579,21 +569,76 @@
         return;
       }
 
-      appendLine(`Command not recognized: ${command}`, 'error');
+      appendLine(`Command not recognized: ${escapeHTML(command)}`, 'error');
       appendLine('Try <span class="green">help</span>.', 'system');
+    }
+
+    async function loadProjectsFromXML() {
+      try {
+        const response = await fetch('siteconfig.xml', { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const xmlText = await response.text();
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(xmlText, 'application/xml');
+
+        if (xml.querySelector('parsererror')) {
+          throw new Error('Invalid XML');
+        }
+
+        const parsedProjects = Array.from(xml.querySelectorAll('projects > project')).map((projectNode) => ({
+          id: (projectNode.getAttribute('id') || '').trim(),
+          label: (projectNode.querySelector('labelTxt')?.textContent || '').trim(),
+          url: (projectNode.querySelector('url')?.textContent || '').trim()
+        })).filter((project) => project.url);
+
+        projects = parsedProjects;
+
+        appendLine(`Loaded ${projects.length} project${projects.length === 1 ? '' : 's'} from <span class="green">siteconfig.xml</span>.`, 'system');
+      } catch (error) {
+        appendLine('Could not load <span class="green">siteconfig.xml</span>. Make sure the file is in the same folder and served over HTTP.', 'error');
+      }
     }
 
     input.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
         const value = input.value;
-        input.value = '';
+        setInputValue('');
         handleCommand(value);
+        return;
+      }
+
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        handleHistoryNavigation('up');
+        return;
+      }
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        handleHistoryNavigation('down');
+        return;
+      }
+
+      if (event.key === 'Tab') {
+        event.preventDefault();
+        autocompleteProject();
       }
     });
 
-    document.addEventListener('click', () => input.focus());
-    window.addEventListener('load', () => input.focus());
-  </script>
+    input.addEventListener('input', syncCursor);
+    input.addEventListener('focus', syncCursor);
+    input.addEventListener('blur', syncCursor);
 
+    document.addEventListener('click', () => input.focus());
+
+    window.addEventListener('load', async () => {
+      input.focus();
+      syncCursor();
+      await loadProjectsFromXML();
+    });
+  </script>
 </body>
 </html>
