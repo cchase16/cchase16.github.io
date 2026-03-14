@@ -89,22 +89,24 @@ function createPit({ index, position, row, state, onPitClick, highlightedPit, pi
   const displayNumber = row === 'bottom' ? index + 1 : index - 6;
   const stones = state.board[index];
 
+  const seedClass = row === 'bottom' ? 'player-one-seed' : 'player-two-seed';
+
   btn.innerHTML = `
     <div class="pit-rim"></div>
     <div class="pit-label">Pit ${displayNumber}</div>
     <div class="pit-count">${stones}</div>
-    <div class="stone-dots">${renderDots(stones)}</div>
+    <div class="stone-dots">${renderDots(stones, seedClass)}</div>
   `;
 
   btn.addEventListener('click', () => onPitClick(index));
   return btn;
 }
 
-function renderDots(count) {
+function renderDots(count, seedClass) {
   const limit = Math.min(count, 16);
   let html = '';
   for (let i = 0; i < limit; i += 1) {
-    html += '<span class="stone-dot"></span>';
+    html += `<span class="stone-dot ${seedClass}"></span>`;
   }
   if (count > limit) {
     html += `<span class="pit-label extra-count">+${count - limit}</span>`;
