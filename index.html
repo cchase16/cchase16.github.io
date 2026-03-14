@@ -453,7 +453,7 @@
         id: (projectNode.getAttribute('id') || '').trim(),
         label: (projectNode.querySelector('labelTxt')?.textContent || '').trim(),
         url: (projectNode.querySelector('url')?.textContent || '').trim(),
-        thumbnailImage: (projectNode.querySelector('thumbnailImage')?.textContent || '').trim().replace(/\/g, '/')
+        thumbnailImage: (projectNode.querySelector('thumbnailImage')?.textContent || '').trim().replace(/\\/g, '/')
       })).filter((project) => project.url);
 
       projectsLoaded = true;
