@@ -134,83 +134,89 @@
     }
 
     .command-shell {
-      width: min(860px, 100%);
+      width: min(960px, 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 28px;
+      gap: 30px;
     }
 
     .prompt-card {
-      width: min(720px, 100%);
-      padding: 22px 24px;
+      width: min(560px, 100%);
+      min-height: 84px;
+      padding: 24px 28px;
       border-radius: 22px;
       border: 1px solid rgba(255,255,255,0.08);
-      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
+      background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.018));
       box-shadow: 0 20px 50px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .prompt-card:focus-within {
+      border-color: rgba(99,208,154,0.3);
+      box-shadow: 0 0 0 1px rgba(99,208,154,0.08), 0 20px 50px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .prompt-card.error {
+      border-color: rgba(239,106,91,0.45);
+      animation: shake 180ms linear 1;
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-3px); }
+      50% { transform: translateX(3px); }
+      75% { transform: translateX(-2px); }
+      100% { transform: translateX(0); }
     }
 
     .terminal-input-row {
+      width: 100%;
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: clamp(16px, 2vw, 18px);
-      font-weight: 600;
-      flex-wrap: nowrap;
+      justify-content: center;
+      gap: 0;
+      font-size: clamp(18px, 2.2vw, 22px);
+      font-weight: 500;
+      position: relative;
     }
-
-    .terminal-label { white-space: nowrap; }
-    .amber { color: var(--amber); }
-    .green { color: var(--green); }
 
     .terminal-input-wrap {
       position: relative;
-      flex: 1;
-      min-width: 0;
+      width: 100%;
       display: flex;
       align-items: center;
-      min-height: 28px;
+      justify-content: center;
+      min-height: 32px;
     }
 
     .terminal-input {
       width: 100%;
+      text-align: center;
       background: transparent;
       border: none;
       outline: none;
       color: var(--text);
       font: inherit;
-      caret-color: transparent;
+      caret-color: var(--green);
       padding: 0;
       margin: 0;
     }
 
     .terminal-input::placeholder {
-      color: rgba(174, 184, 198, 0.48);
-    }
-
-    .cursor-box {
-      display: inline-block;
-      width: 11px;
-      height: 1.2em;
-      background: var(--green);
-      box-shadow: 0 0 10px rgba(99,208,154,0.25);
-      animation: blink 1s steps(1) infinite;
-      margin-left: 1px;
-      flex: 0 0 auto;
-    }
-
-    @keyframes blink {
-      0%, 49% { opacity: 1; }
-      50%, 100% { opacity: 0.15; }
+      color: rgba(174, 184, 198, 0.5);
     }
 
     .tiles {
-      width: min(920px, 100%);
+      width: min(960px, 100%);
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
       opacity: 0;
       transform: translateY(10px);
       pointer-events: none;
@@ -227,8 +233,8 @@
       appearance: none;
       width: 100%;
       text-align: left;
-      padding: 18px 18px 16px;
-      border-radius: 20px;
+      padding: 16px;
+      border-radius: 22px;
       border: 1px solid rgba(255,255,255,0.08);
       background: linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.02));
       color: var(--text);
@@ -239,38 +245,39 @@
 
     .tile:hover,
     .tile:focus-visible {
-      transform: translateY(-2px);
+      transform: translateY(-3px);
       border-color: rgba(99,208,154,0.35);
       background: linear-gradient(180deg, rgba(99,208,154,0.08), rgba(255,255,255,0.03));
       box-shadow: 0 0 0 1px rgba(99,208,154,0.08), 0 14px 34px rgba(0,0,0,0.28);
       outline: none;
     }
 
+    .tile-thumb {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: linear-gradient(135deg, rgba(99,208,154,0.16), rgba(255,255,255,0.04));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      display: block;
+      margin-bottom: 14px;
+    }
+
+    .tile-thumb img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
     .tile-title {
       display: block;
       font-size: 15px;
       font-weight: 700;
-      margin-bottom: 8px;
+      letter-spacing: 0.01em;
       color: var(--text);
     }
-
-    .tile-meta {
-      display: block;
-      font-size: 12px;
-      line-height: 1.45;
-      color: var(--muted);
-    }
-
-    .status {
-      min-height: 18px;
-      font-size: 13px;
-      color: var(--muted);
-      text-align: center;
-      letter-spacing: 0.01em;
-    }
-
-    .status.error { color: #ff8a8a; }
-    .status.success { color: var(--green); }
 
     @media (max-width: 760px) {
       body {
@@ -316,17 +323,14 @@
       }
 
       .prompt-card {
+        width: 100%;
+        min-height: 74px;
         padding: 18px 16px;
         border-radius: 18px;
       }
 
       .terminal-input-row {
-        font-size: 15px;
-        align-items: flex-start;
-      }
-
-      .terminal-label {
-        font-size: 14px;
+        font-size: 18px;
       }
     }
   </style>
@@ -360,9 +364,8 @@
       <main class="terminal">
         <div class="center-stage">
           <section class="command-shell" aria-label="Terminal launcher">
-            <div class="prompt-card">
+            <div class="prompt-card" id="promptCard">
               <div class="terminal-input-row">
-                <span class="terminal-label"><span class="amber">visitor</span><span class="green">@terminal.chrischase.dev</span>:~$</span>
                 <div class="terminal-input-wrap">
                   <input
                     id="terminalInput"
@@ -371,15 +374,13 @@
                     spellcheck="false"
                     autocomplete="off"
                     autocapitalize="off"
-                    placeholder="try: list"
+                    placeholder="try : list"
                     aria-label="Terminal command line"
                   />
-                  <span class="cursor-box" id="terminalCursor" aria-hidden="true"></span>
                 </div>
               </div>
             </div>
 
-            <div id="status" class="status" aria-live="polite"></div>
             <div id="projectTiles" class="tiles" aria-live="polite"></div>
           </section>
         </div>
@@ -389,12 +390,27 @@
 
   <script>
     const input = document.getElementById('terminalInput');
-    const cursor = document.getElementById('terminalCursor');
-    const statusEl = document.getElementById('status');
     const tilesEl = document.getElementById('projectTiles');
+    const promptCard = document.getElementById('promptCard');
 
     let projects = [];
     let projectsLoaded = false;
+
+    const placeholderSVG = encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+        <defs>
+          <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#2f4d4f"/>
+            <stop offset="100%" stop-color="#1f2b38"/>
+          </linearGradient>
+        </defs>
+        <rect width="800" height="500" fill="url(#g)"/>
+        <rect x="40" y="40" width="720" height="420" rx="30" fill="none" stroke="rgba(255,255,255,0.14)"/>
+        <circle cx="220" cy="190" r="55" fill="rgba(255,255,255,0.10)"/>
+        <path d="M160 350 L300 240 L410 330 L520 220 L640 350 Z" fill="rgba(255,255,255,0.12)"/>
+        <text x="400" y="420" text-anchor="middle" fill="#d7dde7" font-family="Menlo, Monaco, Consolas, monospace" font-size="34">Image coming soon</text>
+      </svg>
+    `);
 
     function escapeHTML(value) {
       return String(value)
@@ -405,26 +421,21 @@
         .replace(/'/g, '&#39;');
     }
 
-    function syncCursor() {
-      const textWidth = input.value.length === 0 ? 0 : `${Math.max(input.value.length, 1)}ch`;
-      input.style.width = textWidth;
-      cursor.style.display = document.activeElement === input ? 'inline-block' : 'none';
-    }
-
-    function focusInputAtEnd() {
+    function focusInput() {
       input.focus({ preventScroll: true });
       const end = input.value.length;
       input.setSelectionRange(end, end);
-      syncCursor();
     }
 
-    function setStatus(message = '', type = '') {
-      statusEl.textContent = message;
-      statusEl.className = `status ${type}`.trim();
+    function flashPromptError() {
+      promptCard.classList.remove('error');
+      void promptCard.offsetWidth;
+      promptCard.classList.add('error');
+      setTimeout(() => promptCard.classList.remove('error'), 250);
     }
 
     function projectDisplayName(project) {
-      return project.label || project.id || project.url;
+      return project.label || project.id || 'Untitled Project';
     }
 
     async function loadProjectsFromXML() {
@@ -452,19 +463,19 @@
       if (!projects.length) {
         tilesEl.innerHTML = '';
         tilesEl.classList.remove('visible');
-        setStatus('No projects found in siteconfig.xml.', 'error');
         return;
       }
 
       tilesEl.innerHTML = projects.map((project) => `
         <button class="tile" type="button" data-url="${escapeHTML(project.url)}" aria-label="Open ${escapeHTML(projectDisplayName(project))}">
+          <span class="tile-thumb" aria-hidden="true">
+            <img src="data:image/svg+xml;charset=UTF-8,${placeholderSVG}" alt="" />
+          </span>
           <span class="tile-title">${escapeHTML(projectDisplayName(project))}</span>
-          <span class="tile-meta">${escapeHTML(project.url)}</span>
         </button>
       `).join('');
 
       tilesEl.classList.add('visible');
-      setStatus(`${projects.length} project${projects.length === 1 ? '' : 's'} loaded.`, 'success');
     }
 
     async function handleCommand(command) {
@@ -472,18 +483,15 @@
       if (!normalized) return;
 
       if (normalized !== 'list') {
-        setStatus('Only one command is available: list', 'error');
+        flashPromptError();
         return;
       }
 
-      setStatus('Loading projects…');
       try {
         await loadProjectsFromXML();
         renderTiles();
       } catch (error) {
-        tilesEl.innerHTML = '';
-        tilesEl.classList.remove('visible');
-        setStatus('Could not load siteconfig.xml. Keep it in the same folder and serve over HTTP.', 'error');
+        flashPromptError();
       }
     }
 
@@ -491,14 +499,9 @@
       if (event.key === 'Enter') {
         const value = input.value;
         input.value = '';
-        syncCursor();
         await handleCommand(value);
       }
     });
-
-    input.addEventListener('input', syncCursor);
-    input.addEventListener('focus', syncCursor);
-    input.addEventListener('blur', syncCursor);
 
     tilesEl.addEventListener('click', (event) => {
       const tile = event.target.closest('[data-url]');
@@ -509,12 +512,10 @@
 
     document.addEventListener('click', (event) => {
       if (event.target.closest('.tile')) return;
-      focusInputAtEnd();
+      focusInput();
     });
 
-    window.addEventListener('load', () => {
-      focusInputAtEnd();
-    });
+    window.addEventListener('load', focusInput);
   </script>
 </body>
 </html>
