@@ -452,7 +452,8 @@
       projects = Array.from(xml.querySelectorAll('projects > project')).map((projectNode) => ({
         id: (projectNode.getAttribute('id') || '').trim(),
         label: (projectNode.querySelector('labelTxt')?.textContent || '').trim(),
-        url: (projectNode.querySelector('url')?.textContent || '').trim()
+        url: (projectNode.querySelector('url')?.textContent || '').trim(),
+        thumbnailImage: (projectNode.querySelector('thumbnailImage')?.textContent || '').trim().replace(/\/g, '/')
       })).filter((project) => project.url);
 
       projectsLoaded = true;
@@ -466,14 +467,16 @@
         return;
       }
 
-      tilesEl.innerHTML = projects.map((project) => `
+      tilesEl.innerHTML = projects.map((project) => {
+        const thumbSrc = project.thumbnailImage || `data:image/svg+xml;charset=UTF-8,${placeholderSVG}`;
+        return `
         <button class="tile" type="button" data-url="${escapeHTML(project.url)}" aria-label="Open ${escapeHTML(projectDisplayName(project))}">
           <span class="tile-thumb" aria-hidden="true">
-            <img src="data:image/svg+xml;charset=UTF-8,${placeholderSVG}" alt="" />
+            <img src="${escapeHTML(thumbSrc)}" alt="" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml;charset=UTF-8,${placeholderSVG}'" />
           </span>
           <span class="tile-title">${escapeHTML(projectDisplayName(project))}</span>
         </button>
-      `).join('');
+      `}).join('');
 
       tilesEl.classList.add('visible');
     }
