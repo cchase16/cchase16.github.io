@@ -53,6 +53,27 @@ export function isMoveLegal(state, pitIndex, player = state.currentPlayer) {
   return getLegalMoves(state, player).includes(pitIndex);
 }
 
+export function getSowingSequence(state, pitIndex) {
+  if (!isMoveLegal(state, pitIndex)) {
+    throw new Error(`Illegal move: ${pitIndex}`);
+  }
+
+  const player = state.currentPlayer;
+  const opponentStore = getStoreIndex(player === PLAYER_ONE ? PLAYER_TWO : PLAYER_ONE);
+  let stones = state.board[pitIndex];
+  let index = pitIndex;
+  const drops = [];
+
+  while (stones > 0) {
+    index = (index + 1) % state.board.length;
+    if (index === opponentStore) continue;
+    drops.push(index);
+    stones -= 1;
+  }
+
+  return drops;
+}
+
 function sideIsEmpty(board, player) {
   const [start, end] = getPitRange(player);
   for (let i = start; i <= end; i += 1) {

@@ -48,16 +48,6 @@
             </select>
           </div>
 
-          <div id="playerOneBotGroup" class="field-group hidden">
-            <label for="playerOneBot">Player 1 Bot</label>
-            <select id="playerOneBot"></select>
-          </div>
-
-          <div id="playerTwoBotGroup" class="field-group hidden">
-            <label for="playerTwoBot">Player 2 Bot</label>
-            <select id="playerTwoBot"></select>
-          </div>
-
           <div class="inline-buttons action-buttons">
             <button id="undoBtn">Undo Move</button>
             <button id="replayBtn">Replay</button>
@@ -73,6 +63,32 @@
               <button id="pauseResumeBtn">Pause</button>
               <button id="stepBtn">Step</button>
             </div>
+          </div>
+        </section>
+
+        <section class="card controls-card">
+          <h2>Player Information</h2>
+
+          <div class="field-group">
+            <label for="playerOneName">Player 1 Name</label>
+            <input id="playerOneName" type="text" maxlength="32" placeholder="Player 1" />
+          </div>
+
+          <div class="field-group">
+            <label for="playerOneBot">Player 1 Bot</label>
+            <select id="playerOneBot"></select>
+            <div class="small-note">Selectable only in Bot vs Bot.</div>
+          </div>
+
+          <div class="field-group">
+            <label for="playerTwoName">Player 2 Name</label>
+            <input id="playerTwoName" type="text" maxlength="32" placeholder="Player 2" />
+          </div>
+
+          <div class="field-group">
+            <label for="playerTwoBot">Player 2 Bot</label>
+            <select id="playerTwoBot"></select>
+            <div class="small-note">Selectable in Human vs Bot and Bot vs Bot.</div>
           </div>
         </section>
 

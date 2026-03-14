@@ -8,6 +8,9 @@ export function renderBoard({
   state,
   playerConfigs,
   onPitClick,
+  highlightedPit = null,
+  pickedPit = null,
+  animating = false,
 }) {
   boardElement.innerHTML = '';
 
@@ -15,6 +18,7 @@ export function renderBoard({
     label: playerConfigs[PLAYER_TWO]?.label ?? getPlayerLabel(PLAYER_TWO),
     count: state.board[13],
     className: 'left-store',
+    isHighlighted: highlightedPit === 13,
   });
   boardElement.appendChild(leftStore);
 
@@ -25,6 +29,9 @@ export function renderBoard({
       row: 'top',
       state,
       onPitClick,
+      highlightedPit,
+      pickedPit,
+      animating,
     }));
   });
 
@@ -35,6 +42,9 @@ export function renderBoard({
       row: 'bottom',
       state,
       onPitClick,
+      highlightedPit,
+      pickedPit,
+      animating,
     }));
   });
 
@@ -42,29 +52,37 @@ export function renderBoard({
     label: playerConfigs[PLAYER_ONE]?.label ?? getPlayerLabel(PLAYER_ONE),
     count: state.board[6],
     className: 'right-store',
+    isHighlighted: highlightedPit === 6,
   });
   boardElement.appendChild(rightStore);
 }
 
-function createStore({ label, count, className }) {
+function createStore({ label, count, className, isHighlighted }) {
   const el = document.createElement('div');
-  el.className = `store ${className}`;
+  el.className = `store ${className} ${isHighlighted ? 'seed-highlight' : ''}`.trim();
   el.innerHTML = `
+    <div class="store-grain"></div>
     <div class="store-label">${escapeHtml(label)}</div>
     <div class="store-count">${count}</div>
   `;
   return el;
 }
 
-function createPit({ index, position, row, state, onPitClick }) {
+function createPit({ index, position, row, state, onPitClick, highlightedPit, pickedPit, animating }) {
   const legalMoves = getLegalMoves(state, state.currentPlayer);
   const isLegal = legalMoves.includes(index);
-  const isDisabled = !isLegal || state.gameOver;
+  const isDisabled = animating || !isLegal || state.gameOver;
 
   const btn = document.createElement('button');
   btn.type = 'button';
-  btn.className = `pit ${isLegal ? 'legal active-turn' : ''}`.trim();
+  btn.className = [
+    'pit',
+    isLegal ? 'legal active-turn' : '',
+    highlightedPit === index ? 'seed-highlight' : '',
+    pickedPit === index ? 'pit-picked' : '',
+  ].filter(Boolean).join(' ');
   btn.disabled = isDisabled;
+  btn.dataset.pitIndex = String(index);
   btn.style.gridColumn = String(position + 2);
   btn.style.gridRow = row === 'top' ? '1' : '2';
 
@@ -72,6 +90,7 @@ function createPit({ index, position, row, state, onPitClick }) {
   const stones = state.board[index];
 
   btn.innerHTML = `
+    <div class="pit-rim"></div>
     <div class="pit-label">Pit ${displayNumber}</div>
     <div class="pit-count">${stones}</div>
     <div class="stone-dots">${renderDots(stones)}</div>
@@ -88,7 +107,7 @@ function renderDots(count) {
     html += '<span class="stone-dot"></span>';
   }
   if (count > limit) {
-    html += `<span class="pit-label">+${count - limit}</span>`;
+    html += `<span class="pit-label extra-count">+${count - limit}</span>`;
   }
   return html;
 }
