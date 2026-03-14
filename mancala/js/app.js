@@ -23,7 +23,8 @@ const elements = {
 const modeLabels = {
   'human-vs-human': 'Human vs Human',
   'human-vs-random': 'Human vs Random Bot',
-  'bot-vs-bot': 'Bot vs Bot',
+  'human-vs-greedy': 'Human vs Greedy Bot',
+  'bot-vs-bot': 'Random Bot vs Greedy Bot',
 };
 
 const controller = new GameController({

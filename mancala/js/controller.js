@@ -1,11 +1,13 @@
 import { applyMove, cloneState, createInitialState, getLegalMoves, getPlayerLabel, PLAYER_ONE, PLAYER_TWO } from './engine.js';
 import { RandomBot } from './bots/randomBot.js';
+import { GreedyBot } from './bots/greedyBot.js';
 
 export class GameController {
   constructor({ onStateChange, onLog }) {
     this.onStateChange = onStateChange;
     this.onLog = onLog;
     this.randomBot = new RandomBot();
+    this.greedyBot = new GreedyBot();
     this.state = createInitialState();
     this.mode = 'human-vs-human';
     this.isPaused = false;
@@ -21,10 +23,15 @@ export class GameController {
           [PLAYER_ONE]: { type: 'human', label: 'Player 1' },
           [PLAYER_TWO]: { type: 'bot', label: this.randomBot.name, bot: this.randomBot },
         };
+      case 'human-vs-greedy':
+        return {
+          [PLAYER_ONE]: { type: 'human', label: 'Player 1' },
+          [PLAYER_TWO]: { type: 'bot', label: this.greedyBot.name, bot: this.greedyBot },
+        };
       case 'bot-vs-bot':
         return {
-          [PLAYER_ONE]: { type: 'bot', label: 'Random Bot A', bot: new RandomBot('Random Bot A') },
-          [PLAYER_TWO]: { type: 'bot', label: 'Random Bot B', bot: new RandomBot('Random Bot B') },
+          [PLAYER_ONE]: { type: 'bot', label: 'Random Bot', bot: new RandomBot('Random Bot') },
+          [PLAYER_TWO]: { type: 'bot', label: 'Greedy Bot', bot: new GreedyBot('Greedy Bot') },
         };
       case 'human-vs-human':
       default:
@@ -46,6 +53,7 @@ export class GameController {
     if (!this.isPaused) {
       this.scheduleBotTurn();
     }
+    this.emitState();
   }
 
   restart() {
