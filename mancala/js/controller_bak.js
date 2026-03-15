@@ -1,17 +1,15 @@
 import { applyMove, cloneState, createInitialState, getLegalMoves, getPlayerLabel, PLAYER_ONE, PLAYER_TWO } from './engine.js';
 import { RandomBot } from './bots/randomBot.js';
 import { GreedyBot } from './bots/greedyBot.js';
-import { MinimaxBot } from './bots/minimaxBot.js';
 
 export class GameController {
-  constructor({ onStateChange, onLog, onAnimateMove = null }) {
+  constructor({ onStateChange, onLog, onAnimateMove }) {
     this.onStateChange = onStateChange;
     this.onLog = onLog;
     this.onAnimateMove = onAnimateMove;
     this.botFactories = {
       random: () => new RandomBot(),
       greedy: () => new GreedyBot(),
-      minimax: () => new MinimaxBot({ depth: 4 }),
     };
     this.state = createInitialState();
     this.mode = 'human-vs-human';
@@ -90,14 +88,12 @@ export class GameController {
   }
 
   setMode(mode) {
-    if (this.isAnimating) return;
     this.mode = mode;
     this.playerConfigs = this.buildPlayerConfigs(mode);
     this.restart();
   }
 
   setBotSelection(player, botId) {
-    if (this.isAnimating) return;
     this.botSelections[player] = botId;
     this.playerConfigs = this.buildPlayerConfigs(this.mode);
     this.restart();
@@ -111,15 +107,17 @@ export class GameController {
 
   setBotSpeed(speed) {
     this.botSpeed = speed;
-    if (!this.isPaused) this.scheduleBotTurn();
+    if (!this.isPaused) {
+      this.scheduleBotTurn();
+    }
     this.emitState();
   }
 
   restart() {
     this.clearTimer();
-    this.isAnimating = false;
     this.state = createInitialState();
     this.isPaused = false;
+    this.isAnimating = false;
     this.logEntries = [];
     this.history = [];
     this.captureSnapshot();
@@ -154,26 +152,29 @@ export class GameController {
     return this.playerConfigs[this.state.currentPlayer]?.type === 'bot';
   }
 
-  handleHumanMove(pitIndex) {
-    if (this.state.gameOver || this.isAnimating || this.isCurrentPlayerBot()) return;
-    this.performMove(pitIndex);
+  async handleHumanMove(pitIndex) {
+    if (this.state.gameOver || this.isAnimating) return;
+    if (this.isCurrentPlayerBot()) return;
+    await this.performMove(pitIndex);
   }
 
   async performMove(pitIndex) {
-    if (this.isAnimating) return;
+    if (this.isAnimating || this.state.gameOver) return;
 
     const player = this.state.currentPlayer;
     const playerConfig = this.playerConfigs[player];
     const beforeState = cloneState(this.state);
 
+    this.isAnimating = true;
+    this.emitState();
+
     if (this.onAnimateMove) {
-      this.isAnimating = true;
-      this.emitState();
-      try {
-        await this.onAnimateMove({ state: beforeState, pitIndex, player, playerConfig });
-      } catch {
-        // keep move going even if animation fails
-      }
+      await this.onAnimateMove({
+        state: cloneState(this.state),
+        pitIndex,
+        player,
+        playerConfig,
+      });
     }
 
     this.state = applyMove(this.state, pitIndex);
@@ -183,11 +184,16 @@ export class GameController {
     const sourcePit = player === PLAYER_ONE ? pitIndex + 1 : pitIndex - 6;
     let line = `${playerConfig.label} played pit ${sourcePit}.`;
 
-    if (last.captured > 0) line += ` Capture for ${last.captured} stones.`;
-    if (last.extraTurn && !this.state.gameOver) line += ' Extra turn.';
+    if (last.captured > 0) {
+      line += ` Capture for ${last.captured} stones.`;
+    }
+    if (last.extraTurn && !this.state.gameOver) {
+      line += ' Extra turn.';
+    }
     if (this.state.gameOver) {
-      if (this.state.winner === 'tie') line += ' Game over: tie.';
-      else {
+      if (this.state.winner === 'tie') {
+        line += ' Game over: tie.';
+      } else {
         const winnerLabel = this.playerConfigs[this.state.winner]?.label ?? getPlayerLabel(this.state.winner);
         line += ` Game over: ${winnerLabel} wins.`;
       }
@@ -204,22 +210,24 @@ export class GameController {
 
   scheduleBotTurn() {
     this.clearTimer();
-    if (this.state.gameOver || this.isPaused || this.isAnimating || !this.isCurrentPlayerBot()) return;
+    if (this.state.gameOver || this.isPaused || this.isAnimating || !this.isCurrentPlayerBot()) {
+      return;
+    }
 
-    this.botTimer = setTimeout(() => {
+    this.botTimer = setTimeout(async () => {
       this.botTimer = null;
-      this.runBotTurn();
+      await this.runBotTurn();
     }, this.botSpeed);
   }
 
-  runBotTurn() {
+  async runBotTurn() {
     if (this.state.gameOver || this.isPaused || this.isAnimating || !this.isCurrentPlayerBot()) return;
     const player = this.state.currentPlayer;
     const bot = this.playerConfigs[player]?.bot;
     const move = bot?.chooseMove(cloneState(this.state), player);
     const legalMoves = getLegalMoves(this.state, player);
     if (move == null || !legalMoves.includes(move)) return;
-    this.performMove(move);
+    await this.performMove(move);
   }
 
   togglePause() {
@@ -229,18 +237,22 @@ export class GameController {
     this.scheduleBotTurn();
   }
 
-  step() {
+  async step() {
     if (this.state.gameOver || this.isAnimating) return;
     this.clearTimer();
-    if (this.isCurrentPlayerBot()) this.runBotTurn();
+    if (this.isCurrentPlayerBot()) {
+      await this.runBotTurn();
+    }
   }
 
   undo() {
     if (this.history.length <= 1 || this.isAnimating) return;
     this.clearTimer();
     this.history.pop();
-    this.restoreSnapshot(this.history[this.history.length - 1]);
+    const snapshot = this.history[this.history.length - 1];
+    this.restoreSnapshot(snapshot);
     this.isPaused = false;
+    this.isAnimating = false;
     this.emitState();
     this.scheduleBotTurn();
   }
@@ -248,8 +260,10 @@ export class GameController {
   replay() {
     if (this.isAnimating) return;
     this.clearTimer();
-    this.restoreSnapshot(this.history[0]);
+    const initialSnapshot = this.history[0];
+    this.restoreSnapshot(initialSnapshot);
     this.isPaused = false;
+    this.isAnimating = false;
     this.emitState();
     this.scheduleBotTurn();
   }

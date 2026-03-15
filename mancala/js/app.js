@@ -24,6 +24,10 @@ const elements = {
   playerTwoBot: document.getElementById('playerTwoBot'),
   undoBtn: document.getElementById('undoBtn'),
   replayBtn: document.getElementById('replayBtn'),
+  configToggleBtn: document.getElementById('configToggleBtn'),
+  closeDrawerBtn: document.getElementById('closeDrawerBtn'),
+  configDrawer: document.getElementById('configDrawer'),
+  drawerBackdrop: document.getElementById('drawerBackdrop'),
 };
 
 const modeLabels = {
@@ -35,6 +39,7 @@ const modeLabels = {
 const uiEffects = {
   highlightedPit: null,
   pickedPit: null,
+  drawerOpen: false,
 };
 
 let latestViewModel = null;
@@ -42,6 +47,10 @@ let audioContext = null;
 
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function nextFrame() {
+  return new Promise((resolve) => requestAnimationFrame(() => resolve()));
 }
 
 function ensureAudioContext() {
@@ -56,7 +65,7 @@ function ensureAudioContext() {
   return audioContext;
 }
 
-function playTone({ frequency = 440, duration = 0.08, type = 'sine', gain = 0.04, attack = 0.002, release = 0.06 }) {
+function playTone({ frequency = 440, duration = 0.08, type = 'sine', gain = 0.04, attack = 0.002, release = 0.06, detune = 0 }) {
   const ctx = ensureAudioContext();
   if (!ctx) return;
 
@@ -67,10 +76,11 @@ function playTone({ frequency = 440, duration = 0.08, type = 'sine', gain = 0.04
 
   oscillator.type = type;
   oscillator.frequency.setValueAtTime(frequency, now);
+  oscillator.detune.setValueAtTime(detune, now);
 
   filter.type = 'lowpass';
-  filter.frequency.setValueAtTime(1800, now);
-  filter.Q.value = 0.7;
+  filter.frequency.setValueAtTime(1500, now);
+  filter.Q.value = 0.75;
 
   gainNode.gain.setValueAtTime(0.0001, now);
   gainNode.gain.linearRampToValueAtTime(gain, now + attack);
@@ -85,19 +95,75 @@ function playTone({ frequency = 440, duration = 0.08, type = 'sine', gain = 0.04
 }
 
 function playPickupSound() {
-  playTone({ frequency: 210, duration: 0.06, type: 'triangle', gain: 0.05, attack: 0.003, release: 0.1 });
-  setTimeout(() => playTone({ frequency: 285, duration: 0.05, type: 'triangle', gain: 0.035, attack: 0.003, release: 0.08 }), 28);
+  playTone({ frequency: 210, duration: 0.04, type: 'triangle', gain: 0.03, attack: 0.003, release: 0.08, detune: -6 });
+  setTimeout(() => playTone({ frequency: 252, duration: 0.04, type: 'triangle', gain: 0.022, attack: 0.003, release: 0.08, detune: 6 }), 26);
 }
 
 function playTickSound(stepIndex) {
   playTone({
-    frequency: 740 + (stepIndex % 3) * 55,
-    duration: 0.028,
+    frequency: 720 + (stepIndex % 4) * 28,
+    duration: 0.016,
     type: 'square',
-    gain: 0.02,
+    gain: 0.011,
     attack: 0.001,
-    release: 0.03,
+    release: 0.018,
+    detune: stepIndex % 2 === 0 ? -3 : 3,
   });
+}
+
+function getHoleCenter(index) {
+  const target = elements.board.querySelector(`[data-hole-index="${index}"]`);
+  if (!target) return null;
+
+  const boardRect = elements.board.getBoundingClientRect();
+  const rect = target.getBoundingClientRect();
+
+  return {
+    x: rect.left - boardRect.left + rect.width / 2,
+    y: rect.top - boardRect.top + rect.height / 2,
+  };
+}
+
+function pulseLandingTarget(index) {
+  const hole = elements.board.querySelector(`[data-hole-index="${index}"]`);
+  if (!hole) return;
+  hole.classList.remove('landing-bounce');
+  void hole.offsetWidth;
+  hole.classList.add('landing-bounce');
+  setTimeout(() => hole.classList.remove('landing-bounce'), 260);
+}
+
+async function animateSeedTravel(fromIndex, toIndex, seedClassName) {
+  const from = getHoleCenter(fromIndex);
+  const to = getHoleCenter(toIndex);
+  if (!from || !to) {
+    await wait(110);
+    return;
+  }
+
+  const travelSeed = document.createElement('div');
+  travelSeed.className = `travel-seed ${seedClassName}`;
+  travelSeed.style.left = `${from.x}px`;
+  travelSeed.style.top = `${from.y}px`;
+  elements.board.appendChild(travelSeed);
+
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const arcHeight = Math.max(16, Math.min(40, Math.abs(dx) * 0.16 + 18));
+
+  const animation = travelSeed.animate([
+    { transform: 'translate(-50%, -50%) scale(1.05)', offset: 0 },
+    { transform: `translate(calc(-50% + ${dx * 0.5}px), calc(-50% + ${dy * 0.5 - arcHeight}px)) scale(1.16)`, offset: 0.56 },
+    { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.96)`, offset: 1 },
+  ], {
+    duration: 160,
+    easing: 'cubic-bezier(0.22, 0.84, 0.3, 1)',
+    fill: 'forwards',
+  });
+
+  await animation.finished.catch(() => {});
+  travelSeed.remove();
+  pulseLandingTarget(toIndex);
 }
 
 const controller = new GameController({
@@ -108,42 +174,49 @@ const controller = new GameController({
 
 async function animateMove({ state, pitIndex }) {
   const sowingSequence = getSowingSequence(state, pitIndex);
+  const movingSeedClass = state.currentPlayer === PLAYER_ONE ? 'player-one-seed' : 'player-two-seed';
 
   uiEffects.pickedPit = pitIndex;
   uiEffects.highlightedPit = pitIndex;
   renderLatest();
   playPickupSound();
-  await wait(160);
+  await wait(125);
 
+  let fromIndex = pitIndex;
   for (let i = 0; i < sowingSequence.length; i += 1) {
-    uiEffects.highlightedPit = sowingSequence[i];
-    uiEffects.pickedPit = pitIndex;
+    const targetIndex = sowingSequence[i];
+    uiEffects.highlightedPit = targetIndex;
     renderLatest();
+    await nextFrame();
+    await animateSeedTravel(fromIndex, targetIndex, movingSeedClass);
     playTickSound(i);
-    await wait(120);
+    await wait(20);
+    fromIndex = targetIndex;
   }
 
+  await wait(60);
   uiEffects.highlightedPit = null;
   uiEffects.pickedPit = null;
   renderLatest();
 }
 
 function renderBotSelect(selectElement, availableBots, selectedBot) {
-  const currentMarkup = availableBots
-    .map((bot) => `<option value="${bot.id}">${bot.name}</option>`)
-    .join('');
-
-  if (selectElement.innerHTML !== currentMarkup) {
-    selectElement.innerHTML = currentMarkup;
-  }
-
+  const currentMarkup = availableBots.map((bot) => `<option value="${bot.id}">${bot.name}</option>`).join('');
+  if (selectElement.innerHTML !== currentMarkup) selectElement.innerHTML = currentMarkup;
   selectElement.value = selectedBot;
 }
 
 function syncTextInput(input, value) {
-  if (document.activeElement !== input) {
-    input.value = value;
-  }
+  if (document.activeElement !== input) input.value = value;
+}
+
+function setDrawerOpen(open) {
+  uiEffects.drawerOpen = open;
+  elements.configDrawer.classList.toggle('open', open);
+  elements.drawerBackdrop.classList.toggle('hidden', !open);
+  elements.configDrawer.setAttribute('aria-hidden', String(!open));
+  elements.configToggleBtn.setAttribute('aria-expanded', String(open));
+  document.body.style.overflow = open ? 'hidden' : '';
 }
 
 function render(viewModel) {
@@ -189,7 +262,6 @@ function renderLatest() {
   elements.playerTwoName.disabled = isAnimating;
   elements.gameMode.disabled = isAnimating;
   elements.botSpeed.disabled = isAnimating;
-
   elements.stepBtn.disabled = mode === 'human-vs-human' || isAnimating || (!controller.isCurrentPlayerBot() && !state.gameOver);
   elements.pauseResumeBtn.disabled = mode === 'human-vs-human' || state.gameOver || isAnimating;
 
@@ -204,7 +276,7 @@ function renderLatest() {
   } else if (isAnimating) {
     const currentLabel = playerConfigs[state.currentPlayer]?.label ?? getPlayerLabel(state.currentPlayer);
     elements.statusText.textContent = `${currentLabel} is sowing seeds…`;
-    elements.turnText.textContent = 'Wooden pit highlights and tick sounds play as each seed lands.';
+    elements.turnText.textContent = 'Graphite wells pulse softly as each seed lands.';
   } else {
     const currentLabel = playerConfigs[state.currentPlayer]?.label ?? getPlayerLabel(state.currentPlayer);
     const currentType = playerConfigs[state.currentPlayer]?.type ?? 'human';
@@ -227,47 +299,32 @@ function renderLog(entries) {
 }
 
 ['pointerdown', 'keydown', 'touchstart'].forEach((eventName) => {
-  window.addEventListener(eventName, () => {
-    ensureAudioContext();
-  }, { once: true });
+  window.addEventListener(eventName, () => { ensureAudioContext(); }, { once: true });
 });
 
-elements.gameMode.addEventListener('change', (event) => {
-  controller.setMode(event.target.value);
-});
-
-elements.playerOneName.addEventListener('input', (event) => {
-  controller.setPlayerName(PLAYER_ONE, event.target.value);
-});
-
-elements.playerTwoName.addEventListener('input', (event) => {
-  controller.setPlayerName(PLAYER_TWO, event.target.value);
-});
-
-elements.playerOneBot.addEventListener('change', (event) => {
-  controller.setBotSelection(PLAYER_ONE, event.target.value);
-});
-
-elements.playerTwoBot.addEventListener('change', (event) => {
-  controller.setBotSelection(PLAYER_TWO, event.target.value);
-});
-
-elements.botSpeed.addEventListener('input', (event) => {
-  controller.setBotSpeed(Number(event.target.value));
-});
-
+elements.gameMode.addEventListener('change', (event) => controller.setMode(event.target.value));
+elements.playerOneName.addEventListener('input', (event) => controller.setPlayerName(PLAYER_ONE, event.target.value));
+elements.playerTwoName.addEventListener('input', (event) => controller.setPlayerName(PLAYER_TWO, event.target.value));
+elements.playerOneBot.addEventListener('change', (event) => controller.setBotSelection(PLAYER_ONE, event.target.value));
+elements.playerTwoBot.addEventListener('change', (event) => controller.setBotSelection(PLAYER_TWO, event.target.value));
+elements.botSpeed.addEventListener('input', (event) => controller.setBotSpeed(Number(event.target.value)));
 elements.pauseResumeBtn.addEventListener('click', () => controller.togglePause());
 elements.stepBtn.addEventListener('click', () => controller.step());
 elements.undoBtn.addEventListener('click', () => controller.undo());
 elements.replayBtn.addEventListener('click', () => controller.replay());
-elements.newGameBtn.addEventListener('click', () => {
-  controller.restart();
-});
+elements.newGameBtn.addEventListener('click', () => controller.restart());
 elements.clearLogBtn.addEventListener('click', () => {
   if (controller.isAnimating) return;
   controller.logEntries = [];
   renderLog([]);
   controller.emitState();
+});
+
+elements.configToggleBtn.addEventListener('click', () => setDrawerOpen(true));
+elements.closeDrawerBtn.addEventListener('click', () => setDrawerOpen(false));
+elements.drawerBackdrop.addEventListener('click', () => setDrawerOpen(false));
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && uiEffects.drawerOpen) setDrawerOpen(false);
 });
 
 controller.restart();
