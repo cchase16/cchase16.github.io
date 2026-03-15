@@ -14,7 +14,7 @@ export class GameController {
       minimax: () => new MinimaxBot({ depth: 4 }),
     };
     this.state = createInitialState();
-    this.mode = 'human-vs-human';
+    this.mode = 'human-vs-bot';
     this.isPaused = false;
     this.isAnimating = false;
     this.botSpeed = 500;
