@@ -1,20 +1,20 @@
 import { applyMove, cloneState, createInitialState, getLegalMoves, getPlayerLabel, PLAYER_ONE, PLAYER_TWO } from './engine.js';
 import { RandomBot } from './bots/randomBot.js';
 import { GreedyBot } from './bots/greedyBot.js';
+import { MinimaxBot } from './bots/minimaxBot.js';
 
 export class GameController {
-  constructor({ onStateChange, onLog, onAnimateMove }) {
+  constructor({ onStateChange, onLog }) {
     this.onStateChange = onStateChange;
     this.onLog = onLog;
-    this.onAnimateMove = onAnimateMove;
     this.botFactories = {
       random: () => new RandomBot(),
       greedy: () => new GreedyBot(),
+      minimax: () => new MinimaxBot({ depth: 4 }),
     };
     this.state = createInitialState();
     this.mode = 'human-vs-human';
     this.isPaused = false;
-    this.isAnimating = false;
     this.botSpeed = 500;
     this.botTimer = null;
     this.history = [];
@@ -117,7 +117,6 @@ export class GameController {
     this.clearTimer();
     this.state = createInitialState();
     this.isPaused = false;
-    this.isAnimating = false;
     this.logEntries = [];
     this.history = [];
     this.captureSnapshot();
@@ -131,7 +130,6 @@ export class GameController {
       mode: this.mode,
       playerConfigs: this.playerConfigs,
       isPaused: this.isPaused,
-      isAnimating: this.isAnimating,
       botSpeed: this.botSpeed,
       availableBots: this.getAvailableBots(),
       botSelections: { ...this.botSelections },
@@ -152,33 +150,17 @@ export class GameController {
     return this.playerConfigs[this.state.currentPlayer]?.type === 'bot';
   }
 
-  async handleHumanMove(pitIndex) {
-    if (this.state.gameOver || this.isAnimating) return;
+  handleHumanMove(pitIndex) {
+    if (this.state.gameOver) return;
     if (this.isCurrentPlayerBot()) return;
-    await this.performMove(pitIndex);
+    this.performMove(pitIndex);
   }
 
-  async performMove(pitIndex) {
-    if (this.isAnimating || this.state.gameOver) return;
-
+  performMove(pitIndex) {
     const player = this.state.currentPlayer;
     const playerConfig = this.playerConfigs[player];
     const beforeState = cloneState(this.state);
-
-    this.isAnimating = true;
-    this.emitState();
-
-    if (this.onAnimateMove) {
-      await this.onAnimateMove({
-        state: cloneState(this.state),
-        pitIndex,
-        player,
-        playerConfig,
-      });
-    }
-
     this.state = applyMove(this.state, pitIndex);
-    this.isAnimating = false;
 
     const last = this.state.lastMove;
     const sourcePit = player === PLAYER_ONE ? pitIndex + 1 : pitIndex - 6;
@@ -210,60 +192,56 @@ export class GameController {
 
   scheduleBotTurn() {
     this.clearTimer();
-    if (this.state.gameOver || this.isPaused || this.isAnimating || !this.isCurrentPlayerBot()) {
+    if (this.state.gameOver || this.isPaused || !this.isCurrentPlayerBot()) {
       return;
     }
 
-    this.botTimer = setTimeout(async () => {
+    this.botTimer = setTimeout(() => {
       this.botTimer = null;
-      await this.runBotTurn();
+      this.runBotTurn();
     }, this.botSpeed);
   }
 
-  async runBotTurn() {
-    if (this.state.gameOver || this.isPaused || this.isAnimating || !this.isCurrentPlayerBot()) return;
+  runBotTurn() {
+    if (this.state.gameOver || this.isPaused || !this.isCurrentPlayerBot()) return;
     const player = this.state.currentPlayer;
     const bot = this.playerConfigs[player]?.bot;
     const move = bot?.chooseMove(cloneState(this.state), player);
     const legalMoves = getLegalMoves(this.state, player);
     if (move == null || !legalMoves.includes(move)) return;
-    await this.performMove(move);
+    this.performMove(move);
   }
 
   togglePause() {
-    if (this.isAnimating) return;
     this.isPaused = !this.isPaused;
     this.emitState();
     this.scheduleBotTurn();
   }
 
-  async step() {
-    if (this.state.gameOver || this.isAnimating) return;
+  step() {
+    if (this.state.gameOver) return;
     this.clearTimer();
     if (this.isCurrentPlayerBot()) {
-      await this.runBotTurn();
+      this.runBotTurn();
     }
   }
 
   undo() {
-    if (this.history.length <= 1 || this.isAnimating) return;
+    if (this.history.length <= 1) return;
     this.clearTimer();
     this.history.pop();
     const snapshot = this.history[this.history.length - 1];
     this.restoreSnapshot(snapshot);
     this.isPaused = false;
-    this.isAnimating = false;
     this.emitState();
     this.scheduleBotTurn();
   }
 
   replay() {
-    if (this.isAnimating) return;
     this.clearTimer();
     const initialSnapshot = this.history[0];
     this.restoreSnapshot(initialSnapshot);
     this.isPaused = false;
-    this.isAnimating = false;
     this.emitState();
     this.scheduleBotTurn();
   }
