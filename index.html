@@ -469,12 +469,17 @@
       const xml = parser.parseFromString(xmlText, 'application/xml');
       if (xml.querySelector('parsererror')) throw new Error('Invalid XML');
 
+      const getChildText = (parent, tagName) => {
+        const match = Array.from(parent.children).find((child) => child.tagName && child.tagName.toLowerCase() === tagName.toLowerCase());
+        return (match?.textContent || '').trim();
+      };
+
       projects = Array.from(xml.querySelectorAll('projects > project')).map((projectNode) => ({
         id: (projectNode.getAttribute('id') || '').trim(),
-        label: (projectNode.querySelector('labelTxt')?.textContent || '').trim(),
-        url: (projectNode.querySelector('url')?.textContent || '').trim(),
-        thumbnailImage: (projectNode.querySelector('thumbnailImage')?.textContent || '').trim().replace(/\\/g, '/'),
-        okForMobile: /^yes$/i.test((projectNode.querySelector('okformobile, okForMobile')?.textContent || '').trim())
+        label: getChildText(projectNode, 'labelTxt'),
+        url: getChildText(projectNode, 'url'),
+        thumbnailImage: getChildText(projectNode, 'thumbnailImage').replace(/\\/g, '/'),
+        okForMobile: /^yes$/i.test(getChildText(projectNode, 'okforMobile'))
       })).filter((project) => project.url);
 
       projectsLoaded = true;
@@ -518,7 +523,8 @@
 
       try {
         await loadProjectsFromXML();
-        renderTiles(projects.filter((project) => project.okForMobile));
+        const mobileProjects = projects.filter((project) => project.okForMobile);
+        renderTiles(mobileProjects);
       } catch (error) {
         console.error('Unable to load mobile project tiles:', error);
       }
