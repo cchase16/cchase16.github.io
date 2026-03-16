@@ -279,6 +279,14 @@
       color: var(--text);
     }
 
+    .mobile-tiles-mode .command-shell {
+      gap: 20px;
+    }
+
+    .mobile-tiles-mode .prompt-card {
+      display: none;
+    }
+
     @media (max-width: 760px) {
       body {
         display: block;
@@ -421,7 +429,15 @@
         .replace(/'/g, '&#39;');
     }
 
+    function isMobileDevice() {
+      const coarsePointer = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+      const narrowViewport = window.matchMedia && window.matchMedia('(max-width: 760px)').matches;
+      const mobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent || '');
+      return mobileUA || (coarsePointer && narrowViewport);
+    }
+
     function focusInput() {
+      if (document.body.classList.contains('mobile-tiles-mode')) return;
       input.focus({ preventScroll: true });
       const end = input.value.length;
       input.setSelectionRange(end, end);
@@ -453,21 +469,22 @@
         id: (projectNode.getAttribute('id') || '').trim(),
         label: (projectNode.querySelector('labelTxt')?.textContent || '').trim(),
         url: (projectNode.querySelector('url')?.textContent || '').trim(),
-        thumbnailImage: (projectNode.querySelector('thumbnailImage')?.textContent || '').trim().replace(/\\/g, '/')
+        thumbnailImage: (projectNode.querySelector('thumbnailImage')?.textContent || '').trim().replace(/\/g, '/'),
+        okForMobile: /^yes$/i.test((projectNode.querySelector('okformobile, okForMobile')?.textContent || '').trim())
       })).filter((project) => project.url);
 
       projectsLoaded = true;
       return projects;
     }
 
-    function renderTiles() {
-      if (!projects.length) {
+    function renderTiles(projectList = projects) {
+      if (!projectList.length) {
         tilesEl.innerHTML = '';
         tilesEl.classList.remove('visible');
         return;
       }
 
-      tilesEl.innerHTML = projects.map((project) => {
+      tilesEl.innerHTML = projectList.map((project) => {
         const thumbSrc = project.thumbnailImage || `data:image/svg+xml;charset=UTF-8,${placeholderSVG}`;
         return `
         <button class="tile" type="button" data-url="${escapeHTML(project.url)}" aria-label="Open ${escapeHTML(projectDisplayName(project))}">
@@ -479,6 +496,19 @@
       `}).join('');
 
       tilesEl.classList.add('visible');
+    }
+
+    async function initializeMobileTilesMode() {
+      if (!isMobileDevice()) return;
+
+      document.body.classList.add('mobile-tiles-mode');
+
+      try {
+        await loadProjectsFromXML();
+        renderTiles(projects.filter((project) => project.okForMobile));
+      } catch (error) {
+        flashPromptError();
+      }
     }
 
     async function handleCommand(command) {
@@ -518,7 +548,10 @@
       focusInput();
     });
 
-    window.addEventListener('load', focusInput);
+    window.addEventListener('load', async () => {
+      await initializeMobileTilesMode();
+      focusInput();
+    });
   </script>
 </body>
 </html>
