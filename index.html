@@ -469,7 +469,7 @@
         id: (projectNode.getAttribute('id') || '').trim(),
         label: (projectNode.querySelector('labelTxt')?.textContent || '').trim(),
         url: (projectNode.querySelector('url')?.textContent || '').trim(),
-        thumbnailImage: (projectNode.querySelector('thumbnailImage')?.textContent || '').trim().replace(/\/g, '/'),
+        thumbnailImage: (projectNode.querySelector('thumbnailImage')?.textContent || '').trim().replace(/\\/g, '/'),
         okForMobile: /^yes$/i.test((projectNode.querySelector('okformobile, okForMobile')?.textContent || '').trim())
       })).filter((project) => project.url);
 
@@ -502,12 +502,15 @@
       if (!isMobileDevice()) return;
 
       document.body.classList.add('mobile-tiles-mode');
+      promptCard.style.display = 'none';
+      input.setAttribute('tabindex', '-1');
+      input.blur();
 
       try {
         await loadProjectsFromXML();
         renderTiles(projects.filter((project) => project.okForMobile));
       } catch (error) {
-        flashPromptError();
+        console.error('Unable to load mobile project tiles:', error);
       }
     }
 
