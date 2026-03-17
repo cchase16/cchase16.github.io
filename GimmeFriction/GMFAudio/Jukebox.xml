@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Jukebox>
+	<Song>
+		<Position>1</Position>
+		<Default>Yes</Default>
+		<File>GameSong.mp3</File>
+		<Label>Groove Wagon</Label>
+	</Song>
+	<Song>
+		<Position>2</Position>
+		<Default>No</Default>
+		<File>Strollin.mp3</File>
+		<Label>Strollin'</Label>
+	</Song>
+	<Song>
+		<Position>3</Position>
+		<Default>No</Default>
+		<File>LateNightSteam.mp3</File>
+		<Label>Late-night Steam</Label>
+	</Song>
+</Jukebox>
