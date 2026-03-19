@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ObstacleTypes version="1.0">
+  <ObstacleType id="solid-block">
+    <Name>Solid Block</Name>
+    <WidthUnits>2</WidthUnits>
+    <HeightUnits>2</HeightUnits>
+    <Color>#5A6270</Color>
+    <Behavior>reflect</Behavior>
+    <Indestructible>true</Indestructible>
+  </ObstacleType>
+  <ObstacleType id="glass-panel">
+    <Name>Glass Panel</Name>
+    <WidthUnits>2</WidthUnits>
+    <HeightUnits>2</HeightUnits>
+    <Color>#5AC8D8</Color>
+    <Behavior>reflect</Behavior>
+    <Indestructible>true</Indestructible>
+  </ObstacleType>
+</ObstacleTypes>
