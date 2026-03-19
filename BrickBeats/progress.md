@@ -1,0 +1,42 @@
+Original prompt: Brick Beats: A musical spin on the classic brick buster arcade games. The player launches balls at bricks which are spaced around the playing field. The playing field may include bricks and obstacles. When the ball hits an object, it ricochets off it. The player may slide the launcher along the ground with the left or right arrow keys to try and prevent the ball from hitting the ground. If the ball hits the ground, the player loses it and can fire a new ball if there are any left. The game will be data driven and designed from the ground up with extensibility in mind. Maximum priority is given to customization. The player can set the speed of the balls, the theme of the playing field, the background music, and the sounds the launcher and the bricks make when hit to their liking. The bricks will be grouped into categories. Each category can be assigned a different sound that plays when the brick is struck. The sounds will be mainly percussion. In the final version they will be played from mp3 files so we'll need to have an xml file that tells us what sounds are available. It should have the fields: sound name, sound family, location. The game will keep track of which sounds the user has assigned to the categories. It will not be saved or remembered on the server but we will have a simple xml based import/export feature to allow the user to import or export their settings. There will also be a jukebox where the user can select from a list of mp3 loops. These will also be stored as mp3 files on the server and will be loaded from an xml file called Jukebox.xml. It will have song name, description, location fields. Design this game so it can be played on a static web host like GitHub pages.
+
+- 2026-03-18: Created v1 XML spec and sample files for sounds, jukebox tracks, brick categories, obstacle types, levels, generated levels, and settings.
+- 2026-03-18: Starting implementation of a static HTML/CSS/JS game shell with XML-driven content loading and import/export flows.
+- 2026-03-18: Implemented static app shell (`index.html`, `styles.css`, `app.js`) plus modular runtime under `src/`.
+- 2026-03-18: Implemented XML loading, validation, and serialization for sounds, jukebox tracks, brick categories, obstacle types, levels, and settings.
+- 2026-03-18: Implemented gameplay loop with launcher movement, ball launch/loss, ricochet physics, brick durability, obstacle collisions, win/loss flow, HUD, overlays, and fullscreen toggle.
+- 2026-03-18: Implemented customization UI for ball speed, theme selection, launcher sound, per-category brick sounds, jukebox control, level import/export, settings import/export, and procedural level generation.
+- 2026-03-18: Added deterministic automation hooks via `window.render_game_to_text` and `window.advanceTime`, plus `serve.ps1`, `test-actions.json`, and `generate-actions.json` for validation.
+- 2026-03-18: Verified syntax with `node --check` across JS files.
+- 2026-03-18: Verified local browser playthrough via Playwright artifact run in `output/playtest` and visually checked `output/playtest/shot-0.png`.
+- 2026-03-18: Verified generated-level path via Playwright UI-button run in `output/generate-test` and visually checked `output/generate-test/shot-0.png`.
+- 2026-03-18: Fixed a HUD text-alignment bug discovered during screenshot review and updated the XML spec/settings example to include optional `LauncherSoundId`.
+- 2026-03-18: Added score awards for brick hits and bursts, streak tracking across brick/obstacle hits, multiplier thresholds at 5/10/15 streak, HUD streak/multiplier display, and an in-code arcade multiplier sound/graphic celebration.
+- 2026-03-18: Re-verified the scoring HUD and base point values with Playwright artifacts in `output/score-test`.
+- 2026-03-18: Added obstacle hit feedback with a short bounce animation state in rendering and a synthesized arcade obstacle ping in code.
+- 2026-03-18: Swapped the obstacle hit sound from synthesized audio to `SoundEffects/Bounce.mp3`.
+- 2026-03-18: Updated fullscreen mode to zoom the rendered playfield so it fills at least 90% of fullscreen while preserving the original gameplay physics.
+- 2026-03-18: Refactored streak scoring so multiplier bonus points go into a separate streak bank, bank on launcher contact with a synthesized score sound, and are lost on ground contact with a synthesized sad sound.
+- 2026-03-18: Re-verified the updated HUD/state path with Playwright artifacts in `output/streak-bank-test`.
+- 2026-03-18: Added a v1 mobile play path with touch-friendly layout detection, drag-to-move launcher control, tap-to-launch/tap-to-restart, audio unlock on touch, a compact mobile action bar, a slide-out settings drawer, and a rotate-to-landscape gameplay overlay.
+- 2026-03-18: Re-ran a desktop regression pass after the mobile changes and saved artifacts in `output/mobile-regression`.
+- 2026-03-18: Rebranded the project to Brick Beats and removed legacy title references from the app shell, renderer, docs, and prompt notes.
+- 2026-03-18: Updated the visual direction to a neon music-arcade presentation with a top stat bar, Brick Beats marquee branding, glowing stage frame, decorative music motifs, and a top-left menu expander that opens the settings drawer.
+- 2026-03-18: Verified the visual refresh in-browser and saved artifacts in `output/visual-refresh-test`.
+- 2026-03-18: Moved the Brick Beats branding into the lower control lane under the brick grid and updated mobile touch input so the under-field strip is the intended swipe/tap control zone.
+- 2026-03-18: Verified the bottom control band placement in-browser and saved artifacts in `output/control-band-test`.
+- 2026-03-19: Refactored the app into a two-page flow with a dedicated welcome/setup page (`index.html`) and a dedicated play page (`play.html`).
+- 2026-03-19: Added startup-state handoff so welcome-page settings, sound assignments, and imported/generated levels carry into the play page before launch.
+- 2026-03-19: Added a centered SVG logo asset for the welcome page and updated the play page layout to dedicate the viewport to the active field.
+- 2026-03-19: Verified the new Start flow in-browser and saved artifacts in `output/two-page-flow-test`.
+- 2026-03-19: Added a live field preview canvas to the Field Setup card, moved field/source summary below it, and reduced the Generate/Export buttons to make room.
+- 2026-03-19: Wired the setup preview so generated, imported, and default levels redraw immediately and the same selected level continues into the game on Start.
+- 2026-03-19: Added a best-effort fullscreen request on play-page boot when Start is used from the welcome page.
+- 2026-03-19: Verified the welcome-page preview visually in `output/welcome-preview-test` and rechecked direct play-page ready-state behavior in `output/play-direct-test`.
+- 2026-03-19: Added XML-driven power-up support via `data/PowerUps.xml`, including timed falling note pickups, active power-up state, and neon glow metadata.
+- 2026-03-19: Implemented the first power-up type, `pass-through-obstacles`, with obstacle pass-through behavior while active and automatic expiration when the ball touches the bottom of the field.
+- 2026-03-19: Updated rendering so falling power-ups appear as glowing music notes and an active phase-note pickup turns the ball glow neon green.
+- 2026-03-19: Verified timed power-up spawn in `output/powerup-spawn-test` and verified power-up catch/activation glow in `output/powerup-catch-test`.
+- TODO: Add optional theme manifest support if themes should become data-driven too.
+- TODO: Consider adding richer obstacle behaviors now that obstacle types are id-driven.
+- TODO: Consider adding file-upload automation coverage for settings and level import UI if deeper regression testing is needed.

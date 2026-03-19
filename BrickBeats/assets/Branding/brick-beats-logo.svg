@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 320" role="img" aria-labelledby="title desc">
+  <title id="title">Brick Beats Logo</title>
+  <desc id="desc">Neon Brick Beats logo with cyan and orange gradients.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1b1243" />
+      <stop offset="100%" stop-color="#0d0a22" />
+    </linearGradient>
+    <linearGradient id="wordmark" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#42e6ff" />
+      <stop offset="52%" stop-color="#ff5da8" />
+      <stop offset="100%" stop-color="#ffb94b" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="900" height="320" rx="42" fill="url(#bg)" />
+  <rect x="20" y="20" width="860" height="280" rx="32" fill="none" stroke="rgba(255,255,255,0.12)" />
+  <path d="M84 250 C190 185 298 280 410 220 S638 184 804 236" fill="none" stroke="#28498f" stroke-width="10" opacity="0.38"/>
+  <path d="M84 222 C190 157 298 252 410 192 S638 156 804 208" fill="none" stroke="#2f59aa" stroke-width="6" opacity="0.28"/>
+
+  <g filter="url(#glow)">
+    <text x="450" y="166" text-anchor="middle" font-family="Arial Black, Trebuchet MS, sans-serif" font-size="118" fill="#3b105f" opacity="0.95">Brick Beats</text>
+    <text x="450" y="154" text-anchor="middle" font-family="Arial Black, Trebuchet MS, sans-serif" font-size="118" fill="url(#wordmark)" stroke="#fff2ff" stroke-width="6">Brick Beats</text>
+  </g>
+
+  <text x="450" y="225" text-anchor="middle" font-family="Trebuchet MS, sans-serif" font-size="26" fill="#9bf2ff" letter-spacing="8">SET YOUR FIELD. START THE GROOVE.</text>
+</svg>

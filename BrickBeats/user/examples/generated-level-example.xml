@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Level version="1.0" id="generated-20260318-01">
+  <Metadata>
+    <Name>Generated Field Example</Name>
+    <Author>Generator</Author>
+    <Source>generated</Source>
+    <GridColumns>12</GridColumns>
+    <GridRows>8</GridRows>
+    <Seed>MBB-SEED-20260318-A</Seed>
+  </Metadata>
+  <Layout>
+    <Brick categoryId="pulse-red" col="0" row="1" />
+    <Brick categoryId="pulse-red" col="2" row="1" />
+    <Brick categoryId="echo-blue" col="4" row="1" />
+    <Brick categoryId="shimmer-gold" col="6" row="1" />
+    <Brick categoryId="echo-blue" col="8" row="1" />
+    <Brick categoryId="pulse-red" col="10" row="1" />
+
+    <Brick categoryId="echo-blue" col="1" row="3" />
+    <Brick categoryId="shimmer-gold" col="3" row="3" />
+    <Brick categoryId="pulse-red" col="5" row="3" />
+    <Brick categoryId="shimmer-gold" col="7" row="3" />
+
+    <Obstacle typeId="solid-block" col="0" row="5" />
+    <Obstacle typeId="glass-panel" col="9" row="4" />
+  </Layout>
+</Level>

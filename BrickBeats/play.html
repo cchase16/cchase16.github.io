@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brick Beats</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="page-play" data-page="play">
+    <div class="app-shell">
+      <main class="game-panel">
+        <div class="game-toolbar">
+          <a class="toolbar-button toolbar-link" href="./index.html">Setup</a>
+          <div class="toolbar-actions">
+            <button id="mobile-pause-button" class="toolbar-button" type="button">Pause</button>
+            <button id="mobile-fullscreen-button" class="toolbar-button" type="button">Full Screen</button>
+          </div>
+        </div>
+        <div class="canvas-frame">
+          <canvas id="game-canvas" width="1280" height="800" aria-label="Brick Beats game"></canvas>
+          <div id="rotate-overlay" class="rotate-overlay">
+            <div class="rotate-card">
+              <h2>Rotate Device</h2>
+              <p>Use landscape mode to play. Setup lives on the welcome page.</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

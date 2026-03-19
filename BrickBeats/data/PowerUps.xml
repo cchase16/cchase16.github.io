@@ -1,0 +1,12 @@
+<PowerUps version="1.0">
+  <PowerUpType id="phase-note">
+    <Name>Phase Note</Name>
+    <Effect>pass-through-obstacles</Effect>
+    <NoteColor>#5AFF84</NoteColor>
+    <GlowColor>#39FF72</GlowColor>
+    <SpawnBaseSeconds>30</SpawnBaseSeconds>
+    <SpawnRandomMinSeconds>15</SpawnRandomMinSeconds>
+    <SpawnRandomMaxSeconds>30</SpawnRandomMaxSeconds>
+    <DriftSpeed>84</DriftSpeed>
+  </PowerUpType>
+</PowerUps>

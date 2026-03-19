@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BrickCategories version="1.0">
+  <BrickCategory id="pulse-red">
+    <Name>Pulse Red</Name>
+    <Color>#D94B4B</Color>
+    <HitsToBreak>1</HitsToBreak>
+    <DefaultSoundId>808Crickets</DefaultSoundId>
+  </BrickCategory>
+  <BrickCategory id="echo-blue">
+    <Name>Echo Blue</Name>
+    <Color>#4B74D9</Color>
+    <HitsToBreak>2</HitsToBreak>
+    <DefaultSoundId>bell-01</DefaultSoundId>
+  </BrickCategory>
+  <BrickCategory id="shimmer-gold">
+    <Name>Shimmer Gold</Name>
+    <Color>#D9B24B</Color>
+    <HitsToBreak>3</HitsToBreak>
+    <DefaultSoundId>Doink</DefaultSoundId>
+  </BrickCategory>
+</BrickCategories>

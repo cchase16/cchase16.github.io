@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brick Beats Setup</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="page-welcome" data-page="welcome">
+    <main class="welcome-shell">
+      <section class="welcome-hero">
+        <img class="welcome-logo" src="./assets/Branding/brick-beats-logo.svg" alt="Brick Beats" />
+        <p class="welcome-tagline">Build the vibe, lock in your field, then launch into the groove.</p>
+      </section>
+
+      <section class="welcome-grid">
+        <section class="panel-card welcome-card">
+          <h2>Field Setup</h2>
+          <div class="setup-preview-frame">
+            <canvas
+              id="setup-preview-canvas"
+              width="920"
+              height="360"
+              aria-label="Field preview"
+            ></canvas>
+          </div>
+          <div class="setup-summary">
+            <div>
+              <span class="status-label">Current Field</span>
+              <strong id="setup-level-name">Loading...</strong>
+            </div>
+            <div>
+              <span class="status-label">Source</span>
+              <strong id="setup-level-source">-</strong>
+            </div>
+          </div>
+          <div class="button-row setup-button-row">
+            <button id="generate-button" type="button">Generate Field</button>
+            <button id="export-level-button" type="button">Export Level</button>
+          </div>
+          <label class="file-row">
+            <span>Import Level XML</span>
+            <input id="level-import-input" type="file" accept=".xml,text/xml" />
+          </label>
+        </section>
+
+        <section class="panel-card welcome-card">
+          <h2>Customization</h2>
+          <label class="control-row">
+            <span>Ball Speed</span>
+            <input id="ball-speed-input" type="range" min="0.6" max="1.8" step="0.05" value="1" />
+            <strong id="ball-speed-value">1.00x</strong>
+          </label>
+          <label class="control-row">
+            <span>Theme</span>
+            <select id="theme-select"></select>
+          </label>
+          <label class="control-row">
+            <span>Launcher Sound</span>
+            <select id="launcher-sound-select"></select>
+          </label>
+          <div class="assignments">
+            <div class="assignments-header">
+              <span>Brick Category Sounds</span>
+            </div>
+            <div id="category-sound-assignments"></div>
+          </div>
+          <div class="button-row">
+            <button id="export-settings-button" type="button">Export Settings</button>
+          </div>
+          <label class="file-row">
+            <span>Import Settings XML</span>
+            <input id="settings-import-input" type="file" accept=".xml,text/xml" />
+          </label>
+        </section>
+
+        <section class="panel-card welcome-card">
+          <h2>Jukebox</h2>
+          <label class="control-row">
+            <span>Loop</span>
+            <select id="track-select"></select>
+          </label>
+          <div class="button-row">
+            <button id="play-track-button" type="button">Play Track</button>
+            <button id="stop-track-button" type="button">Stop Track</button>
+          </div>
+          <p id="track-description" class="microcopy"></p>
+        </section>
+
+        <section class="panel-card welcome-card compact">
+          <h2>Controls</h2>
+          <p class="microcopy">
+            Desktop: move with Left/Right or A/D, launch with Space, pause with P, toggle fullscreen with F.
+          </p>
+          <p class="microcopy">
+            Mobile: swipe in the lower control strip under the play field and tap there to launch.
+          </p>
+        </section>
+      </section>
+
+      <section class="welcome-start-card">
+        <div>
+          <span class="status-label">Ready Check</span>
+          <strong id="setup-status">Booting manifests...</strong>
+        </div>
+        <button id="start-button" class="start-button" type="button" disabled>Start</button>
+      </section>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

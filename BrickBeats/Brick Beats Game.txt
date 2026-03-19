@@ -1,0 +1,25 @@
+Brick Beats:
+
+A musical spin on the classic brick buster arcade games.  The player launches balls at bricks which are spaced around the playing field.  The playing field may include bricks and obstacles.  When the ball hits an object, it ricochets off it.  The player may slide the launcher along the ground with the left or right arrow keys to try and prevent the ball from hitting the ground.  If the ball hits the ground, the player loses it and can fire a new ball if there are any left.
+
+The game will be data driven and designed from the ground up with extensibility in mind.  Maximum priority is given to customization.  The player can set the speed of the balls, the theme of the playing field, the background music, and the sounds the launcher and the bricks make when hit to their liking.
+
+The bricks will be grouped into categories.  Each category can be assigned a different sound that plays when the brick is struck.  The sounds will be mainly percussion.  In the final version they will be played from mp3 files so we'll need to have an xml file that tells us what sounds are available.  It should have the fields: sound name, sound family, location.  The game will keep track of which sounds the user has assigned to the categories.  It will not be saved or remembered on the server but we will have a simple xml based import/export feature to allow the user to import or export their settings.
+
+There will also be a jukebox where the user can select from a list of mp3 loops.  These will also be stored as mp3 files on the server and will be loaded from an xml file called Jukebox.xml.  It will have song name, description, location fields.
+
+Design this game so it can be played on a static web host like GitHub pages.
+
+Start with a plan first before making any code.
+
+Please implement a scoring system and add a score to the HUD.
+
+Ball hits a brick: 50 points
+Brick bursts:50 points
+
+Streak: Ball hits brick or obstacle without hitting launcher again
+5x = 1.5 times multiplier for score.  Hits are now worth 75.
+10x = 2 times multiplier
+15x = 3 times multiplier
+
+When a streak is reached, an exciting Multiplier! graphic appears on the screen and a sound plays.  For the sound, create an arcade type sound in code.
