@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mancala World Domination Edition</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <div class="workspace-header">
+      <nav class="workspace-tabs" aria-label="Workspace sections" role="tablist">
+        <button id="workspaceTabGame" class="workspace-tab active" type="button" role="tab" aria-selected="true" aria-controls="workspacePanelGame" data-tab-target="game">
+          <span class="tab-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M4 7.5h16M6.5 7.5v9m11-9v9M8.5 11h7m-7 3h5" />
+            </svg>
+          </span>
+          <span class="tab-copy">
+            <strong>Game</strong>
+            <small>Mancala Arena</small>
+          </span>
+        </button>
+
+        <button id="workspaceTabLeaderboard" class="workspace-tab" type="button" role="tab" aria-selected="false" aria-controls="workspacePanelLeaderboard" data-tab-target="leaderboard">
+          <span class="tab-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M6 19h12M7 16V9m5 7V5m5 11v-4" />
+            </svg>
+          </span>
+          <span class="tab-copy">
+            <strong>Leaderboard</strong>
+            <small>Competitive Track</small>
+          </span>
+        </button>
+
+        <button id="workspaceTabBotLab" class="workspace-tab" type="button" role="tab" aria-selected="false" aria-controls="workspacePanelBotLab" data-tab-target="botlab">
+          <span class="tab-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M9 18h6M10 4h4M8 4h8l1 5-5 5v3h-2v-3L7 9l1-5z" />
+            </svg>
+          </span>
+          <span class="tab-copy">
+            <strong>Bot Lab</strong>
+            <small>Evaluation Wing</small>
+          </span>
+        </button>
+      </nav>
+
+      <div class="workspace-brandmark">
+        <img src="Assets/Sprites/MancalaSprite-transparent.png" alt="Mancala logo" />
+      </div>
+
+      <div class="top-actions">
+        <button id="newGameBtn" class="primary-btn">New Game</button>
+        <button id="matchBeginBtn">Match Begin</button>
+        <button id="configToggleBtn" class="icon-btn" aria-expanded="false" aria-controls="configDrawer" aria-label="Open game configuration">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+
+    <main class="workspace-stage">
+      <section id="workspacePanelGame" class="workspace-panel active" role="tabpanel" aria-labelledby="workspaceTabGame" data-tab-panel="game">
+        <section class="board-panel card">
+          <div class="board-header">
+            <div>
+              <div id="statusText" class="status-text">Loading...</div>
+              <div id="turnText" class="turn-text"></div>
+            </div>
+            <div class="board-header-actions">
+              <button id="hintBtn" class="ghost-btn board-hint-btn hidden" type="button">Hint</button>
+              <div id="modeBadge" class="badge">Mode</div>
+            </div>
+          </div>
+
+          <div id="board" class="board" aria-label="Mancala board"></div>
+
+          <div class="legend-row">
+            <span><strong>Bottom side:</strong> Player 1</span>
+            <span><strong>Top side:</strong> Player 2</span>
+          </div>
+        </section>
+      </section>
+
+      <section id="workspacePanelLeaderboard" class="workspace-panel" role="tabpanel" aria-labelledby="workspaceTabLeaderboard" data-tab-panel="leaderboard">
+        <div class="leaderboard-shell">
+          <section class="card leaderboard-hero">
+            <div>
+              <div class="eyebrow">Leaderboard</div>
+              <h2>Arena standings and promotion signals</h2>
+              <p id="leaderboardStatusText" class="subtitle">Finish a match or run an evaluation to start building the board.</p>
+            </div>
+            <div class="leaderboard-metrics">
+              <div class="summary-chip">
+                <span>Featured Matches</span>
+                <strong id="leaderboardMatchesCount">0</strong>
+              </div>
+              <div class="summary-chip">
+                <span>Tracked Contenders</span>
+                <strong id="leaderboardTrackedBots">0</strong>
+              </div>
+              <div class="summary-chip">
+                <span>Promoted Bots</span>
+                <strong id="leaderboardPromotedCount">0</strong>
+              </div>
+              <div class="summary-chip">
+                <span>Current Leader</span>
+                <strong id="leaderboardCurrentLeader">Waiting</strong>
+              </div>
+            </div>
+          </section>
+
+          <div class="leaderboard-grid">
+            <section class="card standings-card">
+              <div class="card-head-row">
+                <h3>Standings</h3>
+                <span class="small-note">Public game bots, promoted contenders, and active lab candidates.</span>
+              </div>
+
+              <div class="table-shell">
+                <table class="leaderboard-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Rank</th>
+                      <th scope="col">Contender</th>
+                      <th scope="col">Track</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Record</th>
+                      <th scope="col">Signal</th>
+                    </tr>
+                  </thead>
+                  <tbody id="leaderboardBody"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="card leaderboard-side-card">
+              <div class="eyebrow">Promotion Flow</div>
+              <h2>Public game and lab stay decoupled</h2>
+              <div class="pipeline-list">
+                <div class="pipeline-item">
+                  <strong>1. Playable arena</strong>
+                  <span>The Mancala game remains the clean public-facing surface.</span>
+                </div>
+                <div class="pipeline-item">
+                  <strong>2. Competitive review</strong>
+                  <span>The leaderboard gives future promotions and rankings a neutral middle layer.</span>
+                </div>
+                <div class="pipeline-item">
+                  <strong>3. Controlled evaluation</strong>
+                  <span>The Bot Lab can stay open now and become staff-only later without redesigning the whole site.</span>
+                </div>
+              </div>
+
+              <div id="leaderboardSnapshot" class="leaderboard-snapshot"></div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section id="workspacePanelBotLab" class="workspace-panel" role="tabpanel" aria-labelledby="workspaceTabBotLab" data-tab-panel="botlab">
+        <section class="lab-panel card" aria-labelledby="botLabHeading">
+          <div class="lab-header">
+            <div>
+              <div class="eyebrow">Bot Lab</div>
+              <h2 id="botLabHeading">Custom Bot Library</h2>
+              <p class="subtitle">Create weighted bots, import learned search models, and evaluate them in a workspace that stays separate from the public game surface.</p>
+            </div>
+            <div id="labEvaluationBadge" class="badge">Idle</div>
+          </div>
+
+          <div class="lab-grid">
+            <section class="card lab-section">
+              <div class="card-head-row">
+                <h3>Profiles</h3>
+                <button id="labCreateProfileBtn" class="ghost-btn">New Profile</button>
+              </div>
+
+              <div class="field-group">
+                <label for="labProfileSelect">Selected Profile</label>
+                <select id="labProfileSelect"></select>
+              </div>
+
+              <div class="inline-buttons compact-buttons">
+                <button id="labDuplicateProfileBtn">Duplicate</button>
+                <button id="labDeleteProfileBtn">Delete</button>
+              </div>
+
+              <div class="inline-buttons compact-buttons">
+                <button id="labExportProfileBtn">Export JSON</button>
+                <button id="labImportProfileBtn">Import JSON</button>
+              </div>
+
+              <input id="labImportInput" type="file" accept="application/json,.json" class="hidden" />
+
+              <div class="field-group">
+                <label for="labProfileName">Profile Name</label>
+                <input id="labProfileName" type="text" maxlength="48" placeholder="Weighted Bot Name" />
+              </div>
+
+              <div id="labProfileMeta" class="small-note"></div>
+            </section>
+
+            <section class="card lab-section">
+              <h3>Play Parameters</h3>
+
+              <div id="labWeightedControls">
+                <div class="field-grid two-up">
+                  <div class="field-group">
+                    <label for="labTemperature" title="Controls how strongly score differences affect move choice. Lower values make the bot more decisive; higher values make it spread choices more evenly.">Temperature</label>
+                    <input id="labTemperature" type="number" min="0.05" max="5" step="0.01" title="Controls how strongly score differences affect move choice. Lower values make the bot more decisive; higher values make it spread choices more evenly." />
+                  </div>
+                  <div class="field-group">
+                    <label for="labEpsilon" title="Chance that the bot ignores its weighted policy and picks a fully random legal move. Higher values increase exploration; lower values trust the learned weights more.">Epsilon</label>
+                    <input id="labEpsilon" type="number" min="0" max="1" step="0.01" title="Chance that the bot ignores its weighted policy and picks a fully random legal move. Higher values increase exploration; lower values trust the learned weights more." />
+                  </div>
+                </div>
+
+                <h3>Training Metadata</h3>
+                <div class="field-grid two-up">
+                  <div class="field-group">
+                    <label for="labLearningRate" title="Controls how large each training weight update is. Higher values learn faster but can become unstable; lower values train more slowly but more smoothly.">Learning Rate</label>
+                    <input id="labLearningRate" type="number" min="0.0001" max="1" step="0.0001" title="Controls how large each training weight update is. Higher values learn faster but can become unstable; lower values train more slowly but more smoothly." />
+                  </div>
+                  <div class="field-group">
+                    <label for="labGamma" title="Discounts how much earlier moves matter during training. Values closer to 1 give more credit to long-term outcomes; lower values focus learning more on recent moves.">Gamma</label>
+                    <input id="labGamma" type="number" min="0" max="1" step="0.01" title="Discounts how much earlier moves matter during training. Values closer to 1 give more credit to long-term outcomes; lower values focus learning more on recent moves." />
+                  </div>
+                  <div class="field-group">
+                    <label for="labBatchSize" title="Sets how many games are grouped before applying policy-gradient updates. Larger batches smooth out noise; smaller batches update more often but can be more erratic.">Batch Size</label>
+                    <input id="labBatchSize" type="number" min="1" max="100000" step="1" title="Sets how many games are grouped before applying policy-gradient updates. Larger batches smooth out noise; smaller batches update more often but can be more erratic." />
+                  </div>
+                  <div class="field-group">
+                    <label for="labEvalGames">Eval Games</label>
+                    <input id="labEvalGames" type="number" min="2" max="10000" step="2" />
+                  </div>
+                </div>
+
+                <div class="field-group">
+                  <label for="labTrainingOpponent">Training Opponent</label>
+                  <select id="labTrainingOpponent"></select>
+                </div>
+              </div>
+
+              <div id="labModelSection" class="hidden">
+                <h3>Search Model Summary</h3>
+                <div id="labModelSummary" class="model-summary"></div>
+              </div>
+            </section>
+
+            <section id="labWeightsSection" class="card lab-section">
+              <div class="card-head-row">
+                <h3>Feature Weights</h3>
+                <button id="labResetWeightsBtn" class="ghost-btn">Zero All</button>
+              </div>
+              <div id="labWeights" class="weights-grid"></div>
+            </section>
+
+            <section class="card lab-section">
+              <h3>Evaluation Runner</h3>
+
+              <div class="field-grid two-up">
+                <div class="field-group">
+                  <label for="labEvalPlayerOne">Player 1</label>
+                  <select id="labEvalPlayerOne"></select>
+                </div>
+                <div class="field-group">
+                  <label for="labEvalPlayerTwo">Player 2</label>
+                  <select id="labEvalPlayerTwo"></select>
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label for="labEvalGamesCount">Games</label>
+                <input id="labEvalGamesCount" type="number" min="1" max="1000" step="1" value="100" />
+              </div>
+
+              <div class="inline-buttons compact-buttons">
+                <button id="labRunEvaluationBtn">Run Evaluation</button>
+              </div>
+
+              <div id="labEvaluationStatus" class="lab-status">Ready to evaluate any two bots from the roster.</div>
+              <div id="labEvaluationSummary" class="lab-summary"></div>
+            </section>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <div id="drawerBackdrop" class="drawer-backdrop hidden"></div>
+  <aside id="configDrawer" class="config-drawer" aria-hidden="true">
+    <div class="drawer-header">
+      <div>
+        <div class="eyebrow">Menu</div>
+        <h2>Game Configuration</h2>
+      </div>
+      <button id="closeDrawerBtn" class="icon-btn close-btn" aria-label="Close game configuration">
+        <span></span><span></span>
+      </button>
+    </div>
+
+    <div class="drawer-content">
+      <section class="card controls-card">
+        <h3>Match Setup</h3>
+        <div class="field-group">
+          <label for="gameMode">Game Mode</label>
+          <select id="gameMode">
+            <option value="human-vs-human">Human vs Human</option>
+            <option value="human-vs-bot">Human vs Bot</option>
+            <option value="bot-vs-bot">Bot vs Bot</option>
+          </select>
+        </div>
+
+        <div class="inline-buttons action-buttons">
+          <button id="undoBtn">Undo Move</button>
+          <button id="replayBtn">Replay</button>
+        </div>
+
+        <div id="botControls" class="bot-controls hidden">
+          <div class="field-group">
+            <label for="botSpeed">Bot Speed</label>
+            <input id="botSpeed" type="range" min="150" max="1500" step="50" value="500" />
+            <div id="botSpeedLabel" class="small-note">500 ms per move</div>
+          </div>
+          <div class="inline-buttons">
+            <button id="pauseResumeBtn">Pause</button>
+            <button id="stepBtn">Step</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card controls-card">
+        <h3>Player Information</h3>
+
+        <div class="field-group">
+          <label for="playerOneName">Player 1 Name</label>
+          <input id="playerOneName" type="text" maxlength="32" placeholder="Player 1" />
+        </div>
+
+        <div class="field-group">
+          <label for="playerOneBot">Player 1 Bot</label>
+          <select id="playerOneBot"></select>
+          <div class="small-note">Selectable only in Bot vs Bot.</div>
+        </div>
+
+        <div class="field-group">
+          <label for="playerTwoName">Player 2 Name</label>
+          <input id="playerTwoName" type="text" maxlength="32" placeholder="Player 2" />
+        </div>
+
+        <div class="field-group">
+          <label for="playerTwoBot">Player 2 Bot</label>
+          <select id="playerTwoBot"></select>
+          <div class="small-note">Selectable in Human vs Bot and Bot vs Bot.</div>
+        </div>
+      </section>
+
+      <section class="card score-card">
+        <h3>Score</h3>
+        <div class="score-grid">
+          <div>
+            <div class="score-label">Player 1 Store</div>
+            <div id="p1StoreScore" class="score-value">0</div>
+          </div>
+          <div>
+            <div class="score-label">Player 2 Store</div>
+            <div id="p2StoreScore" class="score-value">0</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card log-card">
+        <div class="card-head-row">
+          <h3>Move Log</h3>
+          <button id="clearLogBtn" class="ghost-btn">Clear</button>
+        </div>
+        <ol id="moveLog" class="move-log"></ol>
+      </section>
+    </div>
+  </aside>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
